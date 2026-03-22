@@ -1,0 +1,7 @@
+.env
+.dart_tool/
+.idea/
+.packages
+.pub/
+build/
+*.DS_Store

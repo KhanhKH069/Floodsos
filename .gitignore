@@ -1,0 +1,42 @@
+# --- FLUTTER & DART ---
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# --- IDE & EDITOR (VS Code, Android Studio...) ---
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# --- WINDOWS & VISUAL STUDIO (QUAN TRỌNG: ĐỂ FIX LỖI FILE NẶNG) ---
+# Chặn thư mục tạm của Visual Studio
+.vs/
+# Chặn các file database cache nặng
+*.db
+*.opendb
+*.shm
+*.wal
+# Chặn các file cấu hình user local
+*.suo
+*.user
+*.userosscache
+*.slnx
+# Chặn file build tạm của C++
+*.obj
+*.pdb
+*.ipch
+*.ap
+# Chặn thư mục build output của Windows
+x64/
+x86/
+Debug/
+Release/
+
+# --- MAC & LINUX (Phòng hờ) ---
+.DS_Store
