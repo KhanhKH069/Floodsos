@@ -11,6 +11,7 @@ const connectDB      = require('./config/db');
 const authRoutes     = require('./routes/authRoutes');
 const sosRoutes      = require('./routes/sosRoutes');
 const chatRoutes     = require('./routes/chatRoutes');
+const socketManager  = require('./config/socketManager');
 const { backfillSosCsvFromMongo } = require('./controllers/sosController');
 
 const app    = express();
@@ -35,6 +36,9 @@ app.use('/api/chat', chatRoutes);
 connectDB().then(async () => {
     await backfillSosCsvFromMongo();
 });
+
+// Khởi tạo Socket.io trước khi listen
+socketManager.init(server);
 
 server.listen(PORT, '0.0.0.0', () =>
     console.log(`✅ Server chạy tại http://0.0.0.0:${PORT}`)

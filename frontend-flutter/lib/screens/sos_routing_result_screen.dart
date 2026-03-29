@@ -4,11 +4,19 @@
 //   • Ngập THẤP → Self-Evacuation: chỉ đường dân đến điểm trú ẩn
 //   • Ngập CAO  → Rescue Dispatch: kế hoạch cứu hộ từng chặng + xe/xuồng
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:vibration/vibration.dart';
 import '../services/api_service.dart';
+import '../utils/route_helper.dart';
+import '../utils/cached_tile_provider.dart';
+import 'package:flutter/foundation.dart';
+import '../services/offline_routing_service.dart';
 
 class SOSRoutingResultScreen extends StatefulWidget {
   final double lat;
@@ -34,21 +42,128 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
   bool _isLoading = true;
   String? _error;
 
+  // OFF-ROUTE TRACKING
+  StreamSubscription<Position>? _positionStream;
+  bool _isOffRoute = false;
+  final FlutterTts _tts = FlutterTts();
+  double? _currentLat;
+  double? _currentLon;
+
   @override
   void initState() {
     super.initState();
+    _currentLat = widget.lat;
+    _currentLon = widget.lon;
+    _initTts();
     _analyze();
   }
 
-  Future<void> _analyze() async {
+  void _initTts() async {
+    await _tts.setLanguage("vi-VN");
+  }
+
+  Future<void> _analyze([double? newLat, double? newLon]) async {
+    if (newLat != null && newLon != null) {
+      _currentLat = newLat;
+      _currentLon = newLon;
+    }
+
     setState(() { _isLoading = true; _error = null; });
-    final data = await _api.analyzeRoute(widget.lat, widget.lon);
+    final networkData = await _api.analyzeRoute(_currentLat!, _currentLon!);
+    if (!mounted) return;
+    
+    // Nếu rớt mạng (null), lập tức vọt sang Chip AI TFLite Offline
+    final finalData = networkData ?? await OfflineRoutingService.getOfflineAIPath(_currentLat!, _currentLon!);
+    
     if (!mounted) return;
     setState(() {
-      _result  = data;
+      _result  = finalData;
       _isLoading = false;
-      if (data == null) _error = 'Không thể lấy dữ liệu phân tích. Kiểm tra kết nối và routing_api.py.';
+      _isOffRoute = false;
+      if (_result == null) { // Vẫn null (Cực hiếm)
+        _error = 'TFLite Model hỏng hoặc máy tải không nổi.';
+      } else {
+        _startNavigation();
+      }
     });
+  }
+
+  void _startNavigation() {
+    _positionStream?.cancel();
+    
+    Geolocator.checkPermission().then((permission) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        return;
+      }
+      
+      LocationSettings settings;
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        settings = AndroidSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+          forceLocationManager: true,
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+            notificationText: "Đang theo dõi lộ trình an toàn...",
+            notificationTitle: "Flood SOS Đang Chạy Nền",
+            enableWakeLock: true,
+          ),
+        );
+      } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+        settings = AppleSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+          pauseLocationUpdatesAutomatically: false,
+          showBackgroundLocationIndicator: true,
+        );
+      } else {
+        settings = const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+        );
+      }
+
+      _positionStream = Geolocator.getPositionStream(locationSettings: settings)
+          .listen((Position position) {
+        if (_routePoints.isEmpty) return;
+        
+        LatLng myLoc = LatLng(position.latitude, position.longitude);
+
+        double distance = RouteHelper.getMinDistanceFromRoute(myLoc, _routePoints);
+
+        if (distance > 20.0 && !_isOffRoute) {
+          setState(() { _isOffRoute = true; });
+          _triggerOffRouteWarning(myLoc);
+        } else if (distance <= 20.0 && _isOffRoute) {
+          setState(() { _isOffRoute = false; });
+        }
+      });
+    });
+  }
+
+  Future<void> _triggerOffRouteWarning(LatLng wrongLocation) async {
+    if (await Vibration.hasVibrator() == true) {
+      Vibration.vibrate(pattern: [500, 1000, 500, 1000]); 
+    }
+    
+    await _tts.speak("Cảnh báo, bạn đang đi chệch hướng lộ trình an toàn!");
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('🛑 BẠN ĐANG ĐI SAI ĐƯỜNG!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 4),
+      ),
+    );
+
+    _analyze(wrongLocation.latitude, wrongLocation.longitude);
+  }
+
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    _tts.stop();
+    super.dispose();
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -141,7 +256,7 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
             const Text('AI đang phân tích tuyến đường...',
                 style: TextStyle(color: Colors.white70, fontSize: 16)),
             const SizedBox(height: 8),
-            Text('Vị trí SOS: ${widget.lat.toStringAsFixed(5)}, ${widget.lon.toStringAsFixed(5)}',
+            Text('Vị trí: ${_currentLat!.toStringAsFixed(5)}, ${_currentLon!.toStringAsFixed(5)}',
                 style: const TextStyle(color: Colors.white38, fontSize: 12)),
           ],
         ),
@@ -278,7 +393,7 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
     if (points.isEmpty) return const SizedBox.shrink();
 
     final center = points[points.length ~/ 2];
-    final sosPoint = LatLng(widget.lat, widget.lon);
+    final sosPoint = LatLng(_currentLat!, _currentLon!);
 
     return SizedBox(
       height: 260,
@@ -291,6 +406,7 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             userAgentPackageName: 'com.floodsos.app',
+            tileProvider: CachedTileProvider(),
           ),
           // Vẽ route theo màu ngập từng chặng
           for (final seg in _segments)
@@ -411,11 +527,11 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.home, color: Colors.green, size: 22),
-              const SizedBox(width: 8),
-              const Text('Điểm sơ tán đề xuất',
+              Icon(Icons.home, color: Colors.green, size: 22),
+              SizedBox(width: 8),
+              Text('Điểm sơ tán đề xuất',
                   style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,

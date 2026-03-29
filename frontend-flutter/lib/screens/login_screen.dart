@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'Đăng nhập với tài khoản admin',
                     style: TextStyle(
                       fontSize: 14,
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(
+                    child: const Text(
                       '← Quay lại',
                       style: TextStyle(color: ThemeConfig.tealLight),
                     ),

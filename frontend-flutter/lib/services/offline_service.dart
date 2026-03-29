@@ -2,6 +2,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/sos_model.dart';
+import '../utils/app_logger.dart';
+import '../services/mesh_service.dart';
 
 class OfflineService {
   static Database? _db;
@@ -67,9 +69,12 @@ class OfflineService {
 
         // Xóa khỏi SQLite sau khi thành công
         await db.delete('pending_sos', where: 'id = ?', whereArgs: [sos.id]);
-        print("Đã đồng bộ SOS: ${sos.id}");
+        appLogger.i("Đã đồng bộ SOS: ${sos.id}");
+        
+        // Tắt mạch phát sóng BLE Mesh vì đã có sóng 4G/Wifi
+        MeshService().stopMeshNetwork();
       } catch (e) {
-        print("Lỗi đồng bộ SOS ${map['id']}: $e");
+        appLogger.e("Lỗi đồng bộ SOS ${map['id']}: $e");
       }
     }
   }

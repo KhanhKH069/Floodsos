@@ -9,8 +9,17 @@ router.get('/', sosController.getAll);
 // POST /api/sos/voice — Gửi SOS (multipart audio hoặc JSON)
 router.post('/voice', sosController.voiceUploadMiddleware, sosController.voiceSos);
 
-// POST /api/sos/route — Phân tích tuyến đường flood-aware
+// Cập nhật trạng thái 'safe' (resolve)
+router.post('/:id/resolve', sosController.resolve);
+
+// Delete SOS Alert from Database
+router.post('/delete/:id', sosController.remove);
+
+// Phân tích lộ trình an toàn từ điểm bắt đầu đến điểm kết thúc
 router.post('/route', sosController.route);
+
+// 🔥 Đồng bộ tracking khi có mạng trở lại
+router.post('/tracking/sync', sosController.syncTrackingOffline);
 
 // GET /api/sos/analyze-route?lat=&lon= — Legacy endpoint
 router.get('/analyze-route', sosController.analyzeRoute);

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/weather_provider.dart';
 import '../config/theme_config.dart';
 import '../widgets/glass_widgets.dart';
+import '../widgets/weather_chart.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -26,7 +27,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
       child: Consumer<WeatherProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(color: ThemeConfig.teal),
             );
           }
@@ -47,6 +48,26 @@ class _WeatherScreenState extends State<WeatherScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (provider.isOffline)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off, color: Colors.white, size: 16),
+                        SizedBox(width: 8),
+                        Text(
+                          "Dữ liệu ngoại tuyến (Từ bản lưu cũ)",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                 // ─── Flood Risk Card ───────────────────────────────
                 GlassCard(
                   borderColor: riskColor.withValues(alpha: 0.6),
@@ -76,7 +97,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 4),
-                      Text(
+                      const Text(
                         "Dựa trên lượng mưa thực tế",
                         style: TextStyle(
                             color: Colors.white54, fontSize: 13),
@@ -94,7 +115,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     children: [
                       Text(
                         data['location'] ?? '',
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: ThemeConfig.tealLight,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -111,7 +132,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       ),
                       Text(
                         data['desc'] ?? '',
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18,
                             color: ThemeConfig.tealLight),
                       ),
@@ -143,6 +164,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 ),
                 const SizedBox(height: 20),
 
+                // ─── Forecast & Chart ──────────────────────────────
+                WeatherForecastWidget(forecast: provider.forecast24h),
+                const SizedBox(height: 20),
+
                 // ─── Refresh ───────────────────────────────────────
                 TealButton(
                   label: 'Cập nhật ngay',
@@ -170,7 +195,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 fontWeight: FontWeight.bold,
                 fontSize: 15)),
         Text(label,
-            style: TextStyle(color: Colors.white54, fontSize: 12)),
+            style: const TextStyle(color: Colors.white54, fontSize: 12)),
       ],
     );
   }

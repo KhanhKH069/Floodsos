@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 // lib/models/sos_model.dart
 
 // Enum trạng thái SOS

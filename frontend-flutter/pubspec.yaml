@@ -49,6 +49,14 @@ dependencies:
   # --- MEDIA ---
   audioplayers: ^6.0.0
   record: ^5.2.0
+  vibration: ^3.1.8
+  flutter_tts: ^4.2.5
+  cached_network_image: ^3.4.1
+  logger: ^2.7.0
+  battery_plus: ^7.0.0
+  device_info_plus: ^12.3.0
+  shared_preferences: ^2.5.5
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,7 @@
+// ignore_for_file: library_prefixes
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../services/api_service.dart'; // Lấy baseUrl từ đây cho đồng bộ
+import '../utils/app_logger.dart';
 
 class SocketService {
   // Singleton: Đảm bảo chỉ có 1 kết nối duy nhất trong toàn App
@@ -21,7 +23,7 @@ class SocketService {
     // Lưu ý: Socket.io cần URL dạng 'http://IP:PORT', không cần /api/...
     final String socketUrl = ApiService.baseUrl;
 
-    print("🔌 SocketService: Đang kết nối tới $socketUrl");
+    appLogger.i("🔌 SocketService: Đang kết nối tới $socketUrl");
 
     try {
       _socket = IO.io(
@@ -36,18 +38,18 @@ class SocketService {
 
       // --- LOG TRẠNG THÁI ---
       _socket!.onConnect((_) {
-        print('✅ Socket Connected! ID: ${_socket!.id}');
+        appLogger.i('✅ Socket Connected! ID: ${_socket!.id}');
       });
 
       _socket!.onDisconnect((_) {
-        print('❌ Socket Disconnected');
+        appLogger.i('❌ Socket Disconnected');
       });
 
       _socket!.onConnectError((err) {
-        print('⚠️ Socket Error: $err');
+        appLogger.e('⚠️ Socket Error: $err');
       });
     } catch (e) {
-      print("💀 Lỗi khởi tạo Socket: $e");
+      appLogger.e("💀 Lỗi khởi tạo Socket: $e");
     }
   }
 

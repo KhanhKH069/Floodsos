@@ -105,8 +105,9 @@ class FloodSOSApp extends StatelessWidget {
               return null;
             }),
             trackColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected))
+              if (states.contains(WidgetState.selected)) {
                 return const Color(0xFF00BCD4);
+              }
               return null;
             }),
           ),

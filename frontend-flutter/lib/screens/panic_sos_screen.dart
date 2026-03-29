@@ -4,13 +4,14 @@ import 'package:uuid/uuid.dart';
 import '../models/sos_model.dart';
 import '../services/offline_service.dart';
 import '../services/firebase_service.dart';
+import '../services/mesh_service.dart';
 import 'sos_tracking_screen.dart';
 
 class PanicSOSScreen extends StatefulWidget {
-  const PanicSOSScreen({Key? key}) : super(key: key);
+  const PanicSOSScreen({super.key});
 
   @override
-  _PanicSOSScreenState createState() => _PanicSOSScreenState();
+  State<PanicSOSScreen> createState() => _PanicSOSScreenState();
 }
 
 class _PanicSOSScreenState extends State<PanicSOSScreen> {
@@ -63,10 +64,13 @@ class _PanicSOSScreenState extends State<PanicSOSScreen> {
     } catch (e) {
       // 3. Thất bại (Offline/Desktop) -> Lưu Local
       await _offlineService.savePendingSOS(newSOS);
+      
+      // Khởi động phát sóng P2P Bluetooth Mesh để cứu hộ tản mạng
+      MeshService().startMeshNetwork(newSOS);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
               FirebaseService.isSupported
                   ? 'Đang offline. SOS đã lưu và sẽ gửi khi có mạng!'

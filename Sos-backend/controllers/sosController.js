@@ -160,11 +160,30 @@ exports.remove = async (req, res) => {
 };
 
 /** POST /api/sos/route — Flood-aware SOS Routing (via routing_api.py) */
+const routeCache = new Map();
+const ROUTE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 exports.route = async (req, res) => {
     const { lat, lon } = req.body || {};
     if (lat === undefined || lon === undefined) {
         return res.status(400).json({ error: 'Thiếu lat/lon' });
     }
+
+    // Grid spacing: ~11m (4 decimal places)
+    const latGrid = Number(lat).toFixed(4);
+    const lonGrid = Number(lon).toFixed(4);
+    const cacheKey = `${latGrid},${lonGrid}`;
+
+    if (routeCache.has(cacheKey)) {
+        const cached = routeCache.get(cacheKey);
+        if (Date.now() - cached.timestamp < ROUTE_CACHE_TTL) {
+            console.log(`[Cache Hit] Serving route from cache for ${cacheKey}`);
+            return res.json(cached.data);
+        } else {
+            routeCache.delete(cacheKey); // Expire
+        }
+    }
+
     const result = await fetchRouteAnalysis({ lat: Number(lat), lon: Number(lon) });
     if (!result) {
         return res.json({
@@ -174,6 +193,8 @@ exports.route = async (req, res) => {
             shelter: null, rescue_base: null, sos_target: [lat, lon]
         });
     }
+
+    routeCache.set(cacheKey, { timestamp: Date.now(), data: result });
     res.json(result);
 };
 
@@ -239,3 +260,49 @@ exports.analyzeRoute = async (req, res) => {
 
 // Export backfill function for use in server.js
 exports.backfillSosCsvFromMongo = backfillSosCsvFromMongo;
+
+/** POST /api/sos/tracking/sync — Đồng bộ dữ liệu tracking offline */
+exports.syncTrackingOffline = async (req, res) => {
+    try {
+        const { deviceId, role, trackingData } = req.body;
+        if (!deviceId || !trackingData || !Array.isArray(trackingData)) {
+            return res.status(400).json({ error: 'Dữ liệu không hợp lệ' });
+        }
+
+        const socketManager = require('../config/socketManager');
+        const io = socketManager.getIo();
+
+        // Trong kịch bản thực tế, có thể lưu vào MongoDB "TrackingHistory"
+        // Nhưng ở mức realtime, chúng ta phát lại các điểm này cho Admin
+        // Phát từng điểm một hoặc đóng gói lại
+        
+        // Gửi toàn bộ mảng dữ liệu offline lên cho Admin vẽ lại
+        io.emit('tracking_sync_offline', {
+            deviceId,
+            role,
+            trackingData
+        });
+
+        // Lấy điểm cuối cùng trong mảng để cập nhật vị trí hiện tại trên Map
+        if (trackingData.length > 0) {
+            const latestPoint = trackingData[trackingData.length - 1];
+            const activeTrackers = socketManager.getActiveTrackers();
+            
+            latestPoint.deviceId = deviceId;
+            latestPoint.role = role;
+            
+            activeTrackers.set(deviceId, {
+                ...latestPoint,
+                lastSeen: Date.now()
+            });
+
+            // Gửi vị trí mới nhất như 1 event realtime thông thường
+            io.emit('tracking_update', latestPoint);
+        }
+
+        res.status(200).json({ success: true, synced: trackingData.length });
+    } catch (e) {
+        console.error('syncTrackingOffline error:', e);
+        res.status(500).json({ error: 'Lỗi đồng bộ tracking offline' });
+    }
+};

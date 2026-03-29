@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../providers/auth_provider.dart';
+import '../models/user_model.dart';
+import '../utils/app_logger.dart';
 import 'admin_dashboard_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -39,17 +41,36 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
       if (!mounted) return;
 
-      print('Login result: $result'); // Debug
+      appLogger.i('Login result: $result'); // Debug
 
       if (result['success'] == true) {
-        // Lưu thông tin đăng nhập vào Provider
+        // Kiểm tra quyền Admin — chặn tài khoản user thường
+        final role = result['role'] ??
+            result['user']?['role'] ??
+            '';
+        if (role != 'admin') {
+          _showError(
+              'Tài khoản này không có quyền truy cập Admin.\nVui lòng liên hệ quản trị viên hệ thống.');
+          return;
+        }
+
+        // Lưu session đã xác thực vào Provider
+        if (!mounted) return;
         final auth = Provider.of<AuthProvider>(context, listen: false);
-        auth.login(
+        auth.setSession(
           result['token'] ?? '',
-          result['user']?['name'] ?? 'Admin',
+          UserModel(
+            id: result['_id'] ?? result['id'] ?? result['user']?['_id'] ?? '',
+            name: result['fullName'] ??
+                result['user']?['fullName'] ??
+                _userController.text.trim(),
+            email: _userController.text.trim(),
+            role: 'admin',
+            phone: result['phone'] ?? result['user']?['phone'],
+          ),
         );
 
-        // Chuyển sang Dashboard
+        // Chuyển sang Dashboard Admin
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -60,7 +81,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         _showError(result['message'] ?? 'Đăng nhập thất bại');
       }
     } catch (e) {
-      print('Login error: $e'); // Debug
+      appLogger.e('Login error: $e'); // Debug
       if (!mounted) return;
       _showError(
           'Không thể kết nối tới server.\nVui lòng kiểm tra:\n• Server đang chạy?\n• URL đúng chưa?');

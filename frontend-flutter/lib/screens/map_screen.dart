@@ -7,6 +7,7 @@ import '../models/sos_alert_model.dart';
 import '../services/api_service.dart';
 import '../config/theme_config.dart';
 import '../widgets/glass_widgets.dart';
+import '../utils/cached_tile_provider.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -21,6 +22,7 @@ class _MapScreenState extends State<MapScreen> {
 
   List<SOSAlertModel> _alerts = [];
   bool _isLoading = true;
+  bool _showRadar = false;
 
   @override
   void initState() {
@@ -67,9 +69,12 @@ class _MapScreenState extends State<MapScreen> {
   Color _getAlertColor(SOSAlertModel alert) {
     if (alert.status == 'critical' ||
         alert.waterLevel == 'Khẩn cấp' ||
-        alert.waterLevel == 'Cao') return ThemeConfig.sosRed;
-    if (alert.status == 'warning' || alert.waterLevel == 'Trung bình')
+        alert.waterLevel == 'Cao') {
+      return ThemeConfig.sosRed;
+    }
+    if (alert.status == 'warning' || alert.waterLevel == 'Trung bình') {
       return ThemeConfig.warnAmber;
+    }
     return const Color(0xFF26A69A);
   }
 
@@ -84,11 +89,11 @@ class _MapScreenState extends State<MapScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
               children: [
-                Icon(Icons.map_outlined, color: ThemeConfig.teal, size: 22),
+                const Icon(Icons.map_outlined, color: ThemeConfig.teal, size: 22),
                 const SizedBox(width: 10),
-                Text(
+                const Text(
                   'Bản đồ Cứu hộ',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
@@ -102,10 +107,10 @@ class _MapScreenState extends State<MapScreen> {
                     _loadAlerts();
                   },
                   child: Row(children: [
-                    Icon(Icons.refresh, size: 14, color: ThemeConfig.tealLight),
+                    const Icon(Icons.refresh, size: 14, color: ThemeConfig.tealLight),
                     const SizedBox(width: 4),
                     Text('${_alerts.length} SOS',
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: ThemeConfig.tealLight, fontSize: 12)),
                   ]),
                 ),
@@ -116,7 +121,7 @@ class _MapScreenState extends State<MapScreen> {
           // Map area
           Expanded(
             child: _isLoading
-                ? Center(
+                ? const Center(
                     child:
                         CircularProgressIndicator(color: ThemeConfig.teal))
                 : Stack(
@@ -138,7 +143,17 @@ class _MapScreenState extends State<MapScreen> {
                               urlTemplate:
                                   'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                               userAgentPackageName: 'com.floodsos.app',
+                              tileProvider: CachedTileProvider(),
                             ),
+                            if (_showRadar && ApiService.openWeatherApiKey.isNotEmpty)
+                              Opacity(
+                                opacity: 0.65,
+                                child: TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${ApiService.openWeatherApiKey}',
+                                  userAgentPackageName: 'com.floodsos.app',
+                                ),
+                              ),
                             MarkerLayer(markers: _buildMarkers()),
                           ],
                         ),
@@ -146,18 +161,18 @@ class _MapScreenState extends State<MapScreen> {
 
                       // Empty state
                       if (_alerts.isEmpty)
-                        Positioned(
+                        const Positioned(
                           top: 16,
                           left: 16,
                           right: 16,
                           child: GlassCard(
                             borderRadius: 14,
-                            padding: const EdgeInsets.all(14),
+                            padding: EdgeInsets.all(14),
                             child: Row(children: [
                               Icon(Icons.info_outline,
                                   color: ThemeConfig.tealLight),
-                              const SizedBox(width: 10),
-                              const Expanded(
+                              SizedBox(width: 10),
+                              Expanded(
                                 child: Text(
                                   'Hiện chưa có yêu cầu cứu hộ nào',
                                   style: TextStyle(
@@ -179,7 +194,7 @@ class _MapScreenState extends State<MapScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('Chú giải',
+                              const Text('Chú giải',
                                   style: TextStyle(
                                       color: ThemeConfig.tealLight,
                                       fontWeight: FontWeight.bold,
@@ -208,6 +223,20 @@ class _MapScreenState extends State<MapScreen> {
                               }
                             }),
                             const SizedBox(height: 8),
+                            _mapFab(_showRadar ? Icons.cloud_off : Icons.cloudy_snowing, () {
+                              setState(() {
+                                _showRadar = !_showRadar;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(_showRadar ? 'Đã bật phân tích lớp mây & mưa' : 'Đã tắt radar mưa'),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: ThemeConfig.teal,
+                                ),
+                              );
+                            }, isActive: _showRadar),
+                            const SizedBox(height: 8),
                             _mapFab(Icons.add, () {
                               final z = _mapController.camera.zoom;
                               _mapController.move(
@@ -230,7 +259,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _mapFab(IconData icon, VoidCallback onTap) {
+  Widget _mapFab(IconData icon, VoidCallback onTap, {bool isActive = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -238,7 +267,8 @@ class _MapScreenState extends State<MapScreen> {
         height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: ThemeConfig.tealGradient,
+          gradient: isActive ? ThemeConfig.oceanGradient : ThemeConfig.tealGradient,
+          border: isActive ? Border.all(color: Colors.white, width: 1.5) : null,
           boxShadow: [
             BoxShadow(
               color: ThemeConfig.teal.withValues(alpha: 0.35),
@@ -355,7 +385,7 @@ class _MapScreenState extends State<MapScreen> {
                           alert.status == 'critical'
                               ? '🔴 Đang nguy cấp'
                               : '🟠 Cần hỗ trợ',
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: ThemeConfig.tealLight, fontSize: 13),
                         ),
                       ],
@@ -363,7 +393,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ],
               ),
-              Divider(
+              const Divider(
                   height: 24,
                   color: ThemeConfig.glassBorder),
               _infoRow('📍', 'Vị trí',
@@ -381,7 +411,7 @@ class _MapScreenState extends State<MapScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('💬 Lời nhắn:',
+                      const Text('💬 Lời nhắn:',
                           style: TextStyle(
                               color: ThemeConfig.tealLight, fontSize: 12)),
                       const SizedBox(height: 4),
@@ -398,12 +428,20 @@ class _MapScreenState extends State<MapScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.map_outlined, size: 16),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final url = Uri.parse(
+                            'https://www.google.com/maps/dir/?api=1&destination=${alert.latitude},${alert.longitude}&travelmode=driving');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url,
+                              mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      icon: const Icon(Icons.navigation_outlined, size: 16),
                       label: const Text('Chỉ đường'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: ThemeConfig.teal,
-                        side: BorderSide(color: ThemeConfig.teal),
+                        side: const BorderSide(color: ThemeConfig.teal),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
@@ -448,7 +486,7 @@ class _MapScreenState extends State<MapScreen> {
           const SizedBox(width: 10),
           Text('$label: ',
               style:
-                  TextStyle(color: ThemeConfig.tealLight, fontSize: 13)),
+                  const TextStyle(color: ThemeConfig.tealLight, fontSize: 13)),
           Expanded(
             child: Text(value,
                 style: const TextStyle(

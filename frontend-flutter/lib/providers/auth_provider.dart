@@ -90,6 +90,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Store an already-verified session (used by AdminLoginScreen after
+  /// the role check has been done externally).
+  void setSession(String token, UserModel user) {
+    _token = token;
+    _user = user;
+    notifyListeners();
+  }
+
   void logout() {
     _token = null;
     _user = null;

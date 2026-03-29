@@ -9,6 +9,8 @@ import '../screens/weather_screen.dart';
 import '../screens/map_screen.dart';
 import '../screens/alerts_list_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/admin_login_screen.dart';
+import '../screens/admin_dashboard_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -20,6 +22,8 @@ class AppRouter {
   static const String map = '/map';
   static const String alerts = '/alerts';
   static const String profile = '/profile';
+  static const String adminLogin = '/admin-login';
+  static const String adminDashboard = '/admin-dashboard';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -41,6 +45,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AlertsListScreen());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case adminLogin:
+        return MaterialPageRoute(builder: (_) => const AdminLoginScreen());
+      case adminDashboard:
+        return MaterialPageRoute(builder: (_) => const AdminDashboardScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

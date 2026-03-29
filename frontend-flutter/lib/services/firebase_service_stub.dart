@@ -14,7 +14,6 @@ class FirebaseService {
 
   static Future<void> saveSOS(String docId, Map<String, dynamic> data) async {
     debugPrint('⚠️ Desktop mode: Skipping Firestore save');
-    // TODO: Save to local database instead
   }
 
   static Stream<dynamic>? sosStream(String docId) {

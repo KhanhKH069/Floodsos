@@ -147,7 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: ThemeConfig.tealGradient,
                   ),
@@ -155,10 +155,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.white, size: 22),
                 ),
                 const SizedBox(width: 12),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Trợ lý PCTT",
                       style: TextStyle(
                           color: Colors.white,
@@ -230,8 +230,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
           // Typing indicator
           if (_isTyping)
-            Padding(
-              padding: const EdgeInsets.only(left: 20, bottom: 6),
+            const Padding(
+              padding: EdgeInsets.only(left: 20, bottom: 6),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -250,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
             decoration: BoxDecoration(
               color: ThemeConfig.oceanDeep.withValues(alpha: 0.9),
-              border: Border(
+              border: const Border(
                 top: BorderSide(color: ThemeConfig.glassBorder, width: 0.5),
               ),
             ),

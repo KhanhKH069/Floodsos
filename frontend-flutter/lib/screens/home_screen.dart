@@ -11,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 import '../services/api_service.dart';
 import '../widgets/weather_info_widget.dart';
 import '../widgets/glass_widgets.dart';
+import '../widgets/tracking_broadcaster_widget.dart';
 import '../config/theme_config.dart';
 import 'chat_screen.dart';
 import 'map_screen.dart';
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
     try {
       Position pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
       setState(() {
         _currentPosition = pos;
         _locationMessage =
@@ -134,10 +135,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           _audioFilePath = path;
         });
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Chưa cấp quyền Micro!")));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Lỗi Micro!")));
     }
@@ -274,11 +277,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           const Spacer(),
           // Logo + Title
-          Row(
+          const Row(
             children: [
               Icon(Icons.water_drop, color: ThemeConfig.teal, size: 22),
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: 8),
+              Text(
                 'FLOOD SOS',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -329,11 +332,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: Column(
         children: [
           // Weather glass card
-          GlassCard(
-            padding: const EdgeInsets.all(0),
+          const GlassCard(
+            padding: EdgeInsets.all(0),
             borderRadius: 20,
-            margin: const EdgeInsets.only(bottom: 16),
-            child: const WeatherInfoWidget(),
+            margin: EdgeInsets.only(bottom: 16),
+            child: WeatherInfoWidget(),
           ),
 
           // SOS Pulse Button
@@ -578,11 +581,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               FlutterMap(
                 mapController: _mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(19.3400, 105.7100),
+                options: const MapOptions(
+                  initialCenter: LatLng(19.3400, 105.7100),
                   initialZoom: 15.0,
                   interactionOptions:
-                      const InteractionOptions(flags: InteractiveFlag.all),
+                      InteractionOptions(flags: InteractiveFlag.all),
                 ),
                 children: [
                   TileLayer(
@@ -604,13 +607,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             border:
                                 Border.all(color: ThemeConfig.teal, width: 2),
                           ),
-                          child: Icon(Icons.my_location,
+                          child: const Icon(Icons.my_location,
                               color: ThemeConfig.teal, size: 22),
                         ),
                       )
                     ]),
                 ],
               ),
+              // Tracking Broadcaster
+              const TrackingBroadcasterWidget(),
               // GPS label overlay
               Positioned(
                 bottom: 0,
@@ -676,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border(
+        border: const Border(
           top: BorderSide(
             color: ThemeConfig.glassBorder,
             width: 0.5,

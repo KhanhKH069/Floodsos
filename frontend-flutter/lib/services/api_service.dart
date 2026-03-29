@@ -26,7 +26,8 @@ class ApiService {
     headers: {'Content-Type': 'application/json'},
   ));
 
-  String get baseUrl => _backendUrl;
+  static String get baseUrl => _backendUrl;
+  static String get openWeatherApiKey => _owmKey;
 
   // ─── AUTHENTICATION ───────────────────────────────────────────────────────
 

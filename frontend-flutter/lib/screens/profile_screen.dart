@@ -17,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
         builder: (context, provider, _) {
           final user = provider.user;
           if (user == null) {
-            return Center(
+            return const Center(
               child: Text('Chưa đăng nhập',
                   style: TextStyle(color: ThemeConfig.tealLight)),
             );
@@ -134,13 +134,13 @@ class ProfileScreen extends StatelessWidget {
                       // Edit profile
                       OutlinedButton.icon(
                         onPressed: () {},
-                        icon: Icon(Icons.edit_outlined,
+                        icon: const Icon(Icons.edit_outlined,
                             color: ThemeConfig.teal, size: 18),
-                        label: Text('Chỉnh sửa hồ sơ',
+                        label: const Text('Chỉnh sửa hồ sơ',
                             style: TextStyle(color: ThemeConfig.teal)),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          side: BorderSide(color: ThemeConfig.teal),
+                          side: const BorderSide(color: ThemeConfig.teal),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16)),
                         ),
@@ -156,15 +156,15 @@ class ProfileScreen extends StatelessWidget {
                         child: InkWell(
                           onTap: () => _logout(context),
                           borderRadius: BorderRadius.circular(16),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
                                 vertical: 14, horizontal: 20),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.logout,
                                     color: ThemeConfig.sosRed, size: 20),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Text(
                                   'Đăng xuất',
                                   style: TextStyle(
@@ -228,7 +228,7 @@ class ProfileScreen extends StatelessWidget {
         Text(
           email,
           style:
-              TextStyle(fontSize: 13, color: ThemeConfig.tealLight),
+              const TextStyle(fontSize: 13, color: ThemeConfig.tealLight),
         ),
       ],
     );
@@ -270,7 +270,7 @@ class ProfileScreen extends StatelessWidget {
                           fontSize: 14)),
                   if (subtitle.isNotEmpty)
                     Text(subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white54, fontSize: 12)),
                 ],
               ),
@@ -315,7 +315,7 @@ class ProfileScreen extends StatelessWidget {
                         fontSize: 14)),
                 Text(subtitle,
                     style:
-                        TextStyle(color: Colors.white54, fontSize: 12)),
+                        const TextStyle(color: Colors.white54, fontSize: 12)),
               ],
             ),
           ),
@@ -329,7 +329,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _divider() {
-    return Divider(
+    return const Divider(
         height: 1,
         indent: 66,
         color: ThemeConfig.glassBorder);
@@ -342,16 +342,16 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: ThemeConfig.oceanSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('FloodSOS', style: TextStyle(color: Colors.white)),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Phiên bản 2.0.0',
                 style: TextStyle(color: ThemeConfig.tealLight)),
-            const SizedBox(height: 6),
-            const Text('Hệ thống cảnh báo lũ lụt thông minh',
+            SizedBox(height: 6),
+            Text('Hệ thống cảnh báo lũ lụt thông minh',
                 style: TextStyle(color: Colors.white70)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text('UI: Calm Crisis Design',
                 style: TextStyle(color: Colors.white54, fontSize: 12)),
             Text('Developed with ❤️ for Vietnam',
@@ -361,7 +361,7 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Đóng', style: TextStyle(color: ThemeConfig.teal)),
+            child: const Text('Đóng', style: TextStyle(color: ThemeConfig.teal)),
           ),
         ],
       ),
@@ -380,7 +380,7 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Hủy', style: TextStyle(color: ThemeConfig.tealLight)),
+            child: const Text('Hủy', style: TextStyle(color: ThemeConfig.tealLight)),
           ),
           TextButton(
             onPressed: () {
@@ -388,7 +388,7 @@ class ProfileScreen extends StatelessWidget {
               Navigator.of(context).pushNamedAndRemoveUntil(
                   AppRouter.login, (route) => false);
             },
-            child: Text('Đăng xuất',
+            child: const Text('Đăng xuất',
                 style: TextStyle(color: ThemeConfig.sosRed)),
           ),
         ],

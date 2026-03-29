@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
+import '../utils/app_logger.dart';
 
 class WeatherProvider with ChangeNotifier {
   bool isLoading = false;
+  bool isOfflineData = false;
 
   // Dữ liệu thời tiết dạng Map
   Map<String, dynamic> _weatherData = {
@@ -64,6 +68,7 @@ class WeatherProvider with ChangeNotifier {
   List<dynamic> get forecast24h => _forecast24h;
   Map<String, dynamic> get weatherAlert => _weatherAlert;
   List<Map<String, dynamic>> get floodZones => _floodZones;
+  bool get isOffline => isOfflineData;
 
   // FIX: Cho phép gọi không cần tham số (optional parameters)
   Future<void> fetchWeather([double? lat, double? lon]) async {
@@ -84,8 +89,36 @@ class WeatherProvider with ChangeNotifier {
       _forecast24h = forecastRes['forecast'] ?? [];
       _weatherAlert = forecastRes['alert'] ??
           {'level': 'normal', 'message': 'Không có cảnh báo'};
+
+      // Lưu Cache Offline
+      isOfflineData = false;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('weather_cache', jsonEncode(_weatherData));
+      await prefs.setString('forecast_cache', jsonEncode(_forecast24h));
+      await prefs.setString('alert_cache', jsonEncode(_weatherAlert));
+
     } catch (e) {
-      print("Weather Error: $e");
+      appLogger.e("Weather Error: $e");
+      // Tải từ Cache
+      isOfflineData = true;
+      final prefs = await SharedPreferences.getInstance();
+      final cachedWeather = prefs.getString('weather_cache');
+      final cachedForecast = prefs.getString('forecast_cache');
+      final cachedAlert = prefs.getString('alert_cache');
+
+      if (cachedWeather != null) {
+        _weatherData = jsonDecode(cachedWeather);
+      } else {
+        _weatherData['desc'] = 'Không có kết nối & Không có dữ liệu lưu';
+      }
+      
+      if (cachedForecast != null) {
+        _forecast24h = jsonDecode(cachedForecast);
+      }
+      
+      if (cachedAlert != null) {
+        _weatherAlert = jsonDecode(cachedAlert);
+      }
     } finally {
       isLoading = false;
       notifyListeners();

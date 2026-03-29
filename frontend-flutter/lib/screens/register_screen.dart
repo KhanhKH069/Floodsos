@@ -127,8 +127,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelText: 'Số điện thoại',
                       prefixIcon: Icon(Icons.phone)),
                   validator: (v) {
-                    if (v == null || v.isEmpty)
+                    if (v == null || v.isEmpty) {
                       return 'Vui lòng nhập số điện thoại';
+                    }
                     if (v.length < 10) return 'Số điện thoại không hợp lệ';
                     return null;
                   },

@@ -1,11 +1,13 @@
 // lib/screens/admin_map_screen.dart
-// Màn hình bản đồ cứu hộ dành cho Admin — KHÔNG có drone UI.
+// Màn hình bản đồ cứu hộ dành cho Admin — TRUNG TÂM ĐIỀU PHỐI.
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/sos_alert_model.dart';
 import '../services/api_service.dart';
+import '../utils/cached_tile_provider.dart';
 
 class AdminMapScreen extends StatefulWidget {
   const AdminMapScreen({super.key});
@@ -16,6 +18,7 @@ class AdminMapScreen extends StatefulWidget {
 class _AdminMapScreenState extends State<AdminMapScreen> {
   final MapController _mapController = MapController();
   final ApiService _apiService = ApiService();
+  Timer? _refreshTimer;
 
   final LatLng _defaultCenter = const LatLng(19.3400, 105.7100);
 
@@ -27,14 +30,19 @@ class _AdminMapScreenState extends State<AdminMapScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), _autoRefresh);
+    // Tự động làm mới bản đồ mỗi 30 giây — dùng Timer thực sự
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) {
+        if (_isMapReady && mounted) _loadData();
+      },
+    );
   }
 
-  void _autoRefresh() {
-    if (mounted) {
-      if (_isMapReady) _loadData();
-      Future.delayed(const Duration(seconds: 3), _autoRefresh);
-    }
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -94,12 +102,14 @@ class _AdminMapScreenState extends State<AdminMapScreen> {
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.floodsos.app',
+                tileProvider: CachedTileProvider(),
               ),
               if (_showWeatherLayer)
                 TileLayer(
                   urlTemplate:
                       'https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${ApiService.openWeatherApiKey}',
                   userAgentPackageName: 'com.floodsos.app',
+                  tileProvider: CachedTileProvider(),
                 ),
 
               // SOS MARKERS

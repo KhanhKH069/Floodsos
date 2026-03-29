@@ -44,7 +44,7 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
         }
       }
       Position pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.low));
       if (mounted) {
         context
             .read<WeatherProvider>()
@@ -65,8 +65,8 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
         if (provider.isLoading &&
             weather['temp'] == 0.0 &&
             forecastList.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(20),
+          return const Padding(
+            padding: EdgeInsets.all(20),
             child: Center(
                 child: CircularProgressIndicator(color: ThemeConfig.teal)),
           );
@@ -79,8 +79,9 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
         Color riskBadgeColor = ThemeConfig.teal;
         String riskLabel = weather['floodRisk'] ?? 'An toàn';
         if (weather['riskColor'] == 'red') riskBadgeColor = ThemeConfig.sosRed;
-        if (weather['riskColor'] == 'orange')
+        if (weather['riskColor'] == 'orange') {
           riskBadgeColor = ThemeConfig.warnAmber;
+        }
 
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -91,12 +92,12 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.cloud_circle,
                           color: ThemeConfig.teal, size: 22),
-                      const SizedBox(width: 8),
-                      const Text(
+                      SizedBox(width: 8),
+                      Text(
                         "Thời tiết hiện tại",
                         style: TextStyle(
                             color: Colors.white,
@@ -107,7 +108,7 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
                   ),
                   Text(
                     weather['location'] ?? '',
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: ThemeConfig.tealLight, fontSize: 12),
                   ),
                 ],
@@ -133,12 +134,12 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
                       children: [
                         Text(
                           weather['desc'] ?? '',
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: ThemeConfig.tealLight, fontSize: 13),
                         ),
                         Text(
                           "💧 ${weather['humidity']}%  🌧 ${weather['rain']}mm",
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: Colors.white54, fontSize: 12),
                         ),
                       ],
@@ -167,17 +168,17 @@ class _WeatherInfoWidgetState extends State<WeatherInfoWidget> {
 
               // Forecast strip
               if (nextForecast != null) ...[
-                Divider(
+                const Divider(
                     height: 20,
                     color: ThemeConfig.glassBorder),
                 Row(
                   children: [
-                    Icon(Icons.access_time,
+                    const Icon(Icons.access_time,
                         color: ThemeConfig.tealLight, size: 14),
                     const SizedBox(width: 5),
                     Text(
                       "Dự báo ${nextForecast['time']}:  ${nextForecast['temp']}°C  •  ${nextForecast['rain']}mm  •  ${nextForecast['desc']}",
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white54, fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                     ),

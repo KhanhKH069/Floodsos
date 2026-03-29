@@ -43,9 +43,11 @@ class WeatherModel {
     WeatherCondition cond = WeatherCondition.cloudy;
     if (main.contains('rain') || main.contains('drizzle')) {
       cond = WeatherCondition.rainy;
-    } else if (main.contains('thunder'))
+    } else if (main.contains('thunder')) {
       cond = WeatherCondition.stormy;
-    else if (main.contains('clear')) cond = WeatherCondition.clear;
+    } else if (main.contains('clear')) {
+      cond = WeatherCondition.clear;
+    }
 
     // Tạo dữ liệu giả lập cho biểu đồ dự báo (Vì API Free không trả về Hourly)
     List<WeatherForecast> mockForecast = List.generate(24, (index) {
