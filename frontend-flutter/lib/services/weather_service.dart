@@ -14,46 +14,73 @@ class WeatherService {
     return _getMockWeather();
   }
 
-  /// Lấy danh sách vùng ngập lụt (Dữ liệu giả lập cho Nghệ An)
+  /// Lấy danh sách vùng ngập lụt (Dữ liệu giả lập cho Huế)
   static Future<List<FloodZoneModel>> getFloodZones() async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     return [
       FloodZoneModel(
         id: '1',
-        name: 'Vực Bến Thủy (Sông Lam)',
-        latitude: 18.6566,
-        longitude: 105.6946,
+        name: 'Đại Nội Huế',
+        latitude: 16.4690,
+        longitude: 107.5760,
         waterLevel: 5.8,
         riskLevel: FloodRisk.critical,
-        description: 'Mực nước sông Lam dâng cao trên báo động 3.',
+        description: 'Mực nước dâng cao đe dọa các điểm di tích.',
       ),
       FloodZoneModel(
         id: '2',
-        name: 'Huyện Nam Đàn',
-        latitude: 18.7027,
-        longitude: 105.5015,
-        waterLevel: 4.2,
-        riskLevel: FloodRisk.high,
-        description: 'Ngập cục bộ các xã vùng trũng ven sông.',
+        name: 'Phường Hương Sơ',
+        latitude: 16.4950,
+        longitude: 107.5600,
+        waterLevel: 5.2,
+        riskLevel: FloodRisk.critical,
+        description: 'Khu vực thấp trũng bị ngập sâu cục bộ.',
       ),
       FloodZoneModel(
         id: '3',
-        name: 'Thị xã Cửa Lò',
-        latitude: 18.8023,
-        longitude: 105.7121,
-        waterLevel: 1.5,
-        riskLevel: FloodRisk.medium,
-        description: 'Ngập nhẹ một số tuyến đường ven biển do triều cường.',
+        name: 'Phường Vĩ Dạ',
+        latitude: 16.4735,
+        longitude: 107.6072,
+        waterLevel: 4.2,
+        riskLevel: FloodRisk.high,
+        description: 'Ngập cục bộ các nhà dân ven sông Hương.',
       ),
       FloodZoneModel(
         id: '4',
-        name: 'Con Cuông (Vùng núi)',
-        latitude: 19.0350,
-        longitude: 104.9000,
+        name: 'Phường Phú Hậu',
+        latitude: 16.4800,
+        longitude: 107.6100,
+        waterLevel: 3.5,
+        riskLevel: FloodRisk.high,
+        description: 'Giao thông chia cắt nhẹ tại khu tập trung.',
+      ),
+      FloodZoneModel(
+        id: '5',
+        name: 'Chợ An Cựu',
+        latitude: 16.4526,
+        longitude: 107.5912,
+        waterLevel: 1.5,
+        riskLevel: FloodRisk.medium,
+        description: 'Mực nước thấp giáp các trục lộ lớn.',
+      ),
+      FloodZoneModel(
+        id: '6',
+        name: 'Ga Huế',
+        latitude: 16.4590,
+        longitude: 107.5780,
+        waterLevel: 1.2,
+        riskLevel: FloodRisk.medium,
+        description: 'Nước dâng nhẹ ảnh hưởng lưu thông cục bộ.',
+      ),
+      FloodZoneModel(
+        id: '7',
+        name: 'Chùa Thiên Mụ',
+        latitude: 16.4534,
+        longitude: 107.5445,
         waterLevel: 0.2,
         riskLevel: FloodRisk.low,
-        description: 'Tình hình ổn định, có mưa nhỏ.',
+        description: 'Tình hình hoàn toàn ổn định.',
       ),
     ];
   }
@@ -61,7 +88,7 @@ class WeatherService {
   // Hàm tạo dữ liệu thời tiết giả
   static WeatherModel _getMockWeather() {
     return WeatherModel(
-      location: 'Nghệ An (Demo)',
+      location: 'Huế (Demo)',
       temperature: 26.5,
       condition: WeatherCondition.rainy,
       description: 'Mưa rào nhẹ',

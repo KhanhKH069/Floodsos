@@ -59,6 +59,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
     if (confirm == true) {
       setState(() => _isLoading = true);
       bool success = await _apiService.deleteSOS(id);
+      if (!mounted) return;
       if (success) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Đã xóa!")));
@@ -73,14 +74,17 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(launchUri)) await launchUrl(launchUri);
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    }
   }
 
   Future<void> _openMap(double lat, double lon) async {
     final googleMapsUrl =
         Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lon");
-    if (await canLaunchUrl(googleMapsUrl))
+    if (await canLaunchUrl(googleMapsUrl)) {
       await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override

@@ -38,17 +38,22 @@
 ## ✨ Tính Năng
 
 ### Dành cho Người Dùng
-- ✅ Gửi tín hiệu SOS với định vị GPS tự động
-- ✅ Ghi âm tin nhắn khẩn cấp
-- ✅ Điền form thông tin cứu hộ nhanh chóng
-- ✅ Xem thông tin thời tiết hiện tại
-- ✅ Giao diện thân thiện, dễ sử dụng trong tình huống khẩn cấp
+- ✅ Gửi tín hiệu SOS với định vị GPS giả lập (Demo tại Huế) cực kỳ trực quan
+- ✅ **(Tính Năng Mới)** Chế Độ Sinh Tồn (Survival Mode) giúp tiết kiệm pin tối đa, giao diện tối và chỉ hiển thị phao cứu sinh/vùng an toàn khi khẩn cấp.
+- ✅ Ghi âm tín hiệu SOS và tự động chuyển giọng nói khẩn cấp
+- ✅ Điền form thông tin báo cáo tình huống
+- ✅ Xem thông tin thời tiết mở rộng (OpenWeatherMap)
+- ✅ **(Tính Năng Mới)** Đóng góp "Báo Cáo Điểm Ngập" để tạo ra Heatmap cộng đồng toàn thành phố
+- ✅ Hệ thống Chatbot AI (tích hợp Node.js logic) phản hồi đường dây nóng
+- ✅ **(Tính Năng Mới)** Mở rộng Bản Đồ Cộng Đồng với Marker Clustering gộp nhóm thông minh để không gây giật lag khi tải lượng dữ liệu lớn.
 
-### Dành cho Admin
-- ✅ Xem danh sách tất cả yêu cầu cứu hộ
-- ✅ Hiển thị vị trí nạn nhân trên bản đồ
-- ✅ Xóa tin giả hoặc tin đã xử lý
-- ✅ Quản lý dữ liệu cứu hộ tập trung
+### Dành cho Admin / Command Center
+- ✅ **(Tính Năng Mới)** Web Dashboard Độc Lập (Central Command) tại localhost:3002 dùng quản lý đội cứu hộ trực quan.
+- ✅ Bảng điều khiển thu thập toàn bộ yêu cầu cứu hộ từ MongoDB
+- ✅ Quản lý đội cứu hộ và phân công nhiệm vụ (Tự động cập nhật toạ độ qua WebSockets)
+- ✅ Nhận tín hiệu SOS báo động ĐỎ với auto-triage (phân loại qua từ khóa)
+- ✅ Live Video Stream Mockup - Mô phỏng màn hình radar/camera từ Drone Cứu Hộ.
+- ✅ Xem Bản đồ Nhiệt (Heatmap) điểm ngập và các Vùng An Toàn (Safe Shelters).
 
 ---
 
@@ -85,7 +90,7 @@ FloodSOS-Complete/
 │   │   ├── config/
 │   │   │   └── app_config.dart       # Cấu hình theme, màu sắc
 │   │   ├── screens/
-│   │   │   ├── admin_dashboard_screen.dart  # Màn hình Admin
+│   │   │   ├── map_screen.dart              # Bản đồ Sinh Tồn
 │   │   │   └── home_screen.dart             # Màn hình Người dùng
 │   │   ├── services/
 │   │   │   └── api_service.dart      # Service gọi API
@@ -177,6 +182,7 @@ npm start
 
 ========================================
 🚀 SERVER ĐANG CHẠY TẠI: http://localhost:3002       
+📟 BẢNG ĐIỀU KHIỂN (COMMAND CENTER): http://localhost:3002/
 📡 API Gửi SOS: POST http://localhost:3002/api/sos/voice
 📡 API Lấy list: GET http://localhost:3002/api/sos   
 ========================================
@@ -184,7 +190,12 @@ npm start
 ✅ 3. MongoDB Connected thành công!
 ```
 
-### Bước 2: Khởi động Flutter App
+### Bước 1.5: Truy Cập Command Center (Dành cho Admin)
+Mở trình duyệt Web (Chrome, Edge, Safari...) của bạn và truy cập:
+👉 **[http://localhost:3002/](http://localhost:3002/)**
+Bạn có thể điều phối đội cứu hộ, xem toạ độ Drone và các Vùng An Toàn ngay trên trình duyệt Desktop.
+
+### Bước 2: Khởi động Flutter App (Dành cho Nạn nhân/Sử dụng di động)
 
 Mở **Terminal 2**:
 
@@ -218,9 +229,13 @@ http://localhost:3002
 
 | Method | Endpoint | Mô Tả | Body |
 |--------|----------|-------|------|
-| `POST` | `/api/sos/voice` | Gửi yêu cầu SOS | `{ name, phone, location, audio, weather }` |
+| `POST` | `/api/sos/voice` | Gửi yêu cầu SOS khẩn cấp (kèm Audio, Triage AI) | FormData |
 | `GET` | `/api/sos` | Lấy danh sách tất cả SOS | - |
 | `DELETE` | `/api/sos/:id` | Xóa một yêu cầu SOS | - |
+| `GET` | `/api/reports` | **(Mới)** Lấy dữ liệu bản đồ Heatmap ngập lụt | - |
+| `POST` | `/api/reports` | **(Mới)** Gửi báo cáo ngập lụt từ cộng đồng | `{ lat, lon, severity, description }` |
+| `POST` | `/api/chat` | Tương tác với hệ thống Chatbot | `{ message }` |
+| `GET` | `/api/drones` | Lấy danh sách đội bay Drone và trạng thái | - |
 
 ### Ví dụ Request
 
@@ -247,7 +262,8 @@ Content-Type: application/json
 
 | Service | Port | URL |
 |---------|------|-----|
-| Backend API | `3002` | http://localhost:3002 |
+| Backend API | `3002` | http://localhost:3002/api/... |
+| Command Center | `3002` | http://localhost:3002/ |
 | Flutter (Dev) | `Auto` | Auto-assigned by Flutter |
 
 ---

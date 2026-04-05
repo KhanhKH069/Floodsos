@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloodSOS - Central Command</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet Configuration -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <i class="fa-solid fa-water"></i>
+                <h1>FloodSOS</h1>
+                <span class="badge">COMMAND</span>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-tab="overview"><i class="fa-solid fa-earth-asia"></i> Overview Map</button>
+            </nav>
+            <div class="legend glass-panel">
+                <h4>Map Legend</h4>
+                <ul>
+                    <li><span class="dot red"></span> Critical SOS</li>
+                    <li><span class="dot warning"></span> Warning SOS</li>
+                    <li><span class="dot blue"></span> Predict/Reports</li>
+                    <li><span class="dot green"></span> Drones</li>
+                    <li><span class="dot cyan"></span> Rescue Teams</li>
+                </ul>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <span>Live Satellite Sync</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="glass-panel top-header">
+                <h2><i class="fa-solid fa-satellite-dish"></i> Tactical Situation Room</h2>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <span class="stat-value text-red" id="stat-sos">0</span>
+                        <span class="stat-label">Pending SOS</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value text-green" id="stat-drones">0</span>
+                        <span class="stat-label">Online Drones</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value text-cyan" id="stat-teams">0</span>
+                        <span class="stat-label">Rescue Teams</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Map View -->
+            <section class="view-panel active glass-panel map-wrapper" id="overview">
+               <div id="map"></div>
+               
+               <!-- Floating Dispatch Panel -->
+               <div id="dispatch-panel" class="floating-panel hidden glass-panel">
+                   <h3><i class="fa-solid fa-truck-medical"></i> Dispatch Unit</h3>
+                   <div id="dispatch-details">Select an SOS marker to review and dispatch.</div>
+                   <div class="dispatch-actions hidden" id="dispatch-actions-div">
+                       <select id="team-selector" class="custom-select"></select>
+                       <div class="action-buttons">
+                           <button class="btn-dispatch" id="btn-confirm-dispatch"><i class="fa-solid fa-bolt"></i> Deploy</button>
+                           <button class="btn-cancel" id="btn-cancel-dispatch"><i class="fa-solid fa-xmark"></i></button>
+                       </div>
+                   </div>
+               </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Drone Live Video Modal -->
+    <div id="drone-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-video"></i> Drone Feed: <span id="drone-name-modal">UAV</span></h3>
+                <button id="close-modal" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="video-container">
+                <div class="radar-container">
+                    <div class="sweep"></div>
+                    <div class="target-grid"></div>
+                    
+                    <div class="hud-overlay top-left">
+                        <span class="hud-rec"><span class="rec-dot"></span> REC 4K</span>
+                    </div>
+                    <div class="hud-overlay top-right">
+                        <span>BAT: <span id="drone-bat">100</span>%</span>
+                    </div>
+                    <div class="hud-overlay center-crosshair">
+                        <div class="ch top"></div>
+                        <div class="ch right"></div>
+                        <div class="ch bottom"></div>
+                        <div class="ch left"></div>
+                        <div class="center-dot"></div>
+                    </div>
+                    <div class="hud-overlay bottom-left">
+                        <span>ALT: 120m AGL</span><br>
+                        <span>SPD: 15 km/h</span>
+                    </div>
+                    <div class="hud-overlay bottom-right">
+                        <span>LAT: <span id="drone-lat">N/A</span></span><br>
+                        <span>LON: <span id="drone-lon">N/A</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

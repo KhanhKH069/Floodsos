@@ -44,7 +44,7 @@ class LocationProvider with ChangeNotifier {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       _latitude = position.latitude;
@@ -54,8 +54,8 @@ class LocationProvider with ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
-      _latitude = 21.0285;
-      _longitude = 105.8542;
+      _latitude = 16.4637;
+      _longitude = 107.5909;
       notifyListeners();
     }
   }

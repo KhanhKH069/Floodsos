@@ -5,12 +5,12 @@ class AppConfig {
   static const String appVersion = '2.0.0';
 
   // API Configuration
-  static const String baseUrl = 'http://127.0.0.1:3001/api';
-  static const String socketUrl = 'http://your-api-server.com';
+  static const String baseUrl = 'http://192.168.1.14:3002/api';
+  static const String socketUrl = 'http://192.168.1.14:3002';
 
   // Map Configuration
-  static const double defaultLatitude = 21.0285; // Hanoi
-  static const double defaultLongitude = 105.8542; // Hanoi
+  static const double defaultLatitude = 16.4637; // Hue
+  static const double defaultLongitude = 107.5909; // Hue
   static const double defaultZoom = 13.0;
 
   // Recording Configuration

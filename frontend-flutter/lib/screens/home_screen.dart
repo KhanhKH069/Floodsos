@@ -4,12 +4,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/api_service.dart';
+import '../services/in_app_notification_service.dart';
+import '../config/theme_config.dart';
 import 'chat_screen.dart';
-import 'login_screen.dart'; // 🟢 Import màn hình đăng nhập Admin
+import 'map_screen.dart';
+import 'weather_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +22,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // ... (Giữ nguyên các biến khai báo cũ: _apiService, _currentPosition, _audioRecorder...)
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final ApiService _apiService = ApiService();
   bool _isSending = false;
+  bool _isSurvivalMode = false;
   Position? _currentPosition;
   String _locationMessage = "Đang lấy vị trí...";
   bool _isLocationReady = false;
@@ -34,15 +39,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _audioFilePath;
 
   final MapController _mapController = MapController();
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
     _determinePosition();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
+    _pulseController.dispose();
     _audioRecorder.dispose();
     _nameController.dispose();
     _phoneController.dispose();
@@ -51,8 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // ... (Giữ nguyên các hàm _startRecording, _stopRecording, _determinePosition, _sendSOS)
-  // COPY LẠI CÁC HÀM ĐÓ Y HỆT NHƯ CŨ NHÉ, KHÔNG THAY ĐỔI GÌ
   Future<void> _startRecording() async {
     try {
       if (await _audioRecorder.hasPermission()) {
@@ -66,10 +75,12 @@ class _HomeScreenState extends State<HomeScreen> {
           _audioFilePath = path;
         });
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Chưa cấp quyền Micro!")));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Lỗi Micro!")));
     }
@@ -84,42 +95,48 @@ class _HomeScreenState extends State<HomeScreen> {
         _audioFilePath = path;
       });
     } catch (e) {
-      print("Lỗi dừng: $e");
+      debugPrint("Lỗi dừng ghi âm: $e");
     }
   }
 
   Future<void> _determinePosition() async {
-    // ... (Giữ nguyên code lấy vị trí cũ)
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() => _locationMessage = "Hãy bật GPS!");
-      return;
-    }
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() => _locationMessage = "Cần quyền vị trí!");
-        return;
-      }
-    }
-    try {
-      Position pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentPosition = pos;
-        _locationMessage =
-            "${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}";
-        _isLocationReady = true;
-      });
-      _mapController.move(LatLng(pos.latitude, pos.longitude), 15.0);
-    } catch (e) {
-      setState(() => _locationMessage = "Lỗi vị trí: $e");
-    }
+    // 🟢 Chế độ Demo: Lấy bừa 1 trong 7 tọa độ Huế
+    final random = Random();
+    final List<LatLng> hueLocations = [
+      const LatLng(16.4690, 107.5760), // Đại Nội
+      const LatLng(16.4950, 107.5600), // Hương Sơ
+      const LatLng(16.4735, 107.6072), // Vĩ Dạ
+      const LatLng(16.4800, 107.6100), // Phú Hậu
+      const LatLng(16.4526, 107.5912), // An Cựu
+      const LatLng(16.4590, 107.5780), // Ga Huế
+      const LatLng(16.4534, 107.5445), // Thiên Mụ
+    ];
+    final target = hueLocations[random.nextInt(hueLocations.length)];
+
+    Position mockPos = Position(
+      latitude: target.latitude,
+      longitude: target.longitude,
+      timestamp: DateTime.now(),
+      accuracy: 10,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+
+    setState(() {
+      _currentPosition = mockPos;
+      _locationMessage =
+          "${mockPos.latitude.toStringAsFixed(4)}, ${mockPos.longitude.toStringAsFixed(4)} (Demo Huế)";
+      _isLocationReady = true;
+    });
+
+    _mapController.move(target, 15.0);
   }
 
   Future<void> _sendSOS() async {
-    // ... (Giữ nguyên code gửi SOS cũ)
     if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Nhập tên & SĐT!")));
@@ -148,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
       success = await _apiService.sendTextSOS(data);
     }
     setState(() => _isSending = false);
+    if (!mounted) return;
     if (success) {
       if (_audioFilePath != null) {
         try {
@@ -155,233 +173,405 @@ class _HomeScreenState extends State<HomeScreen> {
         } catch (_) {}
         setState(() => _audioFilePath = null);
       }
+      // Hiển thị In-App Banner thay vì dialog (mượt mà hơn)
       if (!mounted) return;
-      showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-                  backgroundColor: const Color(0xFF2C2F36),
-                  title: const Text("✅ Đã gửi SOS!",
-                      style: TextStyle(color: Colors.white)),
-                  content: const Text("Đội cứu hộ đã nhận được vị trí.",
-                      style: TextStyle(color: Colors.white70)),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("OK"))
-                  ]));
+      InAppNotificationService.showSOS(
+        context,
+        detail: 'Tín hiệu SOS đã được gửi! Đội cứu hộ đang di chuyển đến vị trí.',
+      );
     } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Lỗi gửi tin!")));
+      _showOfflineSMSDialog();
     }
+  }
+
+  void _showOfflineSMSDialog() {
+    final lat = _currentPosition?.latitude.toStringAsFixed(5) ?? "";
+    final lon = _currentPosition?.longitude.toStringAsFixed(5) ?? "";
+    final name = _nameController.text.isNotEmpty ? _nameController.text : "Nạn nhân";
+    final msg = _msgController.text.isNotEmpty ? _msgController.text : "Cần cứu hộ gấp!";
+    final body = "SOS FloodSOS: $name dang o toa do $lat, $lon. Tinh trang: $msg. Can cuu ho khan cap!";
+    final smsUri = Uri(scheme: 'sms', path: '112', queryParameters: {'body': body});
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: ThemeConfig.darkSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.wifi_off, color: Colors.orange),
+            SizedBox(width: 8),
+            Text("Lỗi Kết Nối Mạng", style: TextStyle(color: Colors.white, fontSize: 18)),
+          ],
+        ),
+        content: const Text(
+          "Không thể gửi tín hiệu SOS qua Internet. Bạn có muốn gửi thông tin tự động qua tin nhắn SMS (Ngoại tuyến) không?",
+          style: TextStyle(color: ThemeConfig.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("HỦY", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
+            onPressed: () async {
+              Navigator.pop(context);
+              bool canLaunch = await canLaunchUrl(smsUri);
+              if (!mounted) return;
+              if (canLaunch) {
+                await launchUrl(smsUri);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Không thể mở ứng dụng nhắn tin!")));
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            icon: const Icon(Icons.sms, color: Colors.white),
+            label: const Text("GỬI SMS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      )
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeConfig.darkBackground,
       appBar: AppBar(
-        // 🟢 1. NÚT ADMIN (ẨN KHÉO LÉO Ở GÓC TRÁI)
-        leading: IconButton(
-          icon: const Icon(Icons.admin_panel_settings_outlined,
-              color: Colors.white24), // Màu mờ (white24) để không gây chú ý
-          tooltip: "Đăng nhập Admin",
-          onPressed: () {
-            // Chuyển sang màn hình đăng nhập Admin
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()));
-          },
-        ),
-
-        title: const Text("FLOOD SOS",
-            style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        centerTitle: true,
-      ),
-
-      // 🟢 2. NÚT CHATBOT (Giữ nguyên)
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ChatScreen())),
-        backgroundColor: Colors.cyanAccent,
-        icon: const Icon(Icons.smart_toy, color: Colors.black, size: 28),
-        label: const Text("HỎI TRỢ LÝ",
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 16)),
-        elevation: 8,
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(25),
-        child: Column(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // LOGO Ở MÀN HÌNH CHÍNH (Thay vì icon cảnh báo, dùng Logo App cho đẹp)
-            SizedBox(
-              height: 100,
-              child: Image.asset('assets/images/logoicnlab.png',
-                  fit: BoxFit.contain), // Hoặc logo nào bạn thích
-            ),
-
-            const SizedBox(height: 20),
-            const Text("Hệ thống tự động lấy GPS để điều Drone.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white54, fontSize: 12)),
-            const SizedBox(height: 20),
-
-            // Các trường nhập liệu (Giữ nguyên)
-            TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                    labelText: "Họ và Tên", prefixIcon: Icon(Icons.person))),
-            const SizedBox(height: 15),
-            TextField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                    labelText: "Số điện thoại", prefixIcon: Icon(Icons.phone)),
-                keyboardType: TextInputType.phone),
-            const SizedBox(height: 15),
-            TextField(
-                controller: _msgController,
-                decoration: const InputDecoration(
-                    labelText: "Lời nhắn", prefixIcon: Icon(Icons.message))),
-            const SizedBox(height: 20),
-
-            // Nút Ghi âm (Giữ nguyên)
-            Listener(
-              onPointerDown: (_) => _startRecording(),
-              onPointerUp: (_) => _stopRecording(),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                    color: _isRecording
-                        ? Colors.redAccent.withOpacity(0.8)
-                        : Colors.white10,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: _isRecording ? Colors.red : Colors.white24)),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(_isRecording ? Icons.mic : Icons.mic_none,
-                      color: Colors.white, size: 30),
-                  const SizedBox(width: 10),
-                  Text(
-                      _isRecording
-                          ? "Đang ghi âm..."
-                          : (_audioFilePath != null
-                              ? "Đã ghi âm (Giữ để ghi lại)"
-                              : "Giữ để ghi âm"),
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold))
-                ]),
-              ),
-            ),
-            if (_audioFilePath != null && !_isRecording)
-              TextButton.icon(
-                icon:
-                    const Icon(Icons.delete, color: Colors.redAccent, size: 16),
-                label: const Text("Xóa file ghi âm",
-                    style: TextStyle(color: Colors.redAccent)),
-                onPressed: () => setState(() => _audioFilePath = null),
-              ),
-
-            const SizedBox(height: 20),
-
-            // Nút SOS (Giữ nguyên)
-            SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                    onPressed:
-                        (_isSending || !_isLocationReady) ? null : _sendSOS,
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isLocationReady ? Colors.red : Colors.grey,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                    icon: _isSending
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2))
-                        : const Icon(Icons.sos, size: 30, color: Colors.white),
-                    label: Text(_isSending ? "ĐANG GỬI..." : "GỬI YÊU CẦU NGAY",
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)))),
-
-            const SizedBox(height: 20),
-
-            // Bản đồ (Giữ nguyên)
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: _isLocationReady ? Colors.green : Colors.grey),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Stack(
-                  children: [
-                    FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: const LatLng(21.0285, 105.8542),
-                        initialZoom: 15.0,
-                        interactionOptions: const InteractionOptions(
-                            flags: InteractiveFlag.all),
-                      ),
-                      children: [
-                        TileLayer(
-                            urlTemplate:
-                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            userAgentPackageName: 'com.floodsos.app'),
-                        if (_currentPosition != null)
-                          MarkerLayer(markers: [
-                            Marker(
-                                point: LatLng(_currentPosition!.latitude,
-                                    _currentPosition!.longitude),
-                                width: 40,
-                                height: 40,
-                                child: const Icon(Icons.my_location,
-                                    color: Colors.red, size: 40))
-                          ]),
-                      ],
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        color: Colors.black54,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 10),
-                        child: Row(
-                          children: [
-                            Icon(Icons.location_on,
-                                size: 14,
-                                color: _isLocationReady
-                                    ? Colors.greenAccent
-                                    : Colors.orange),
-                            const SizedBox(width: 5),
-                            Expanded(
-                                child: Text(_locationMessage,
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                    overflow: TextOverflow.ellipsis)),
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 80),
+            Image.asset('assets/images/logoicnlab.png', width: 36, height: 36),
+            const SizedBox(width: 10),
+            const Text("FLOOD SOS",
+                style: TextStyle(
+                    fontWeight: FontWeight.w900, 
+                    letterSpacing: 2.0, 
+                    color: Colors.white)),
           ],
         ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSurvivalMode ? Icons.battery_charging_full : Icons.battery_saver,
+              color: _isSurvivalMode ? ThemeConfig.safeGreen : Colors.white54,
+            ),
+            tooltip: "Chế độ Sinh Tồn (Tiết kiệm pin)",
+            onPressed: () {
+              setState(() => _isSurvivalMode = !_isSurvivalMode);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(_isSurvivalMode 
+                  ? "Đã BẬT Chế độ Sinh Tồn. Đã tắt tải bản đồ nền để tiết kiệm pin tối đa." 
+                  : "Đã TẮT Chế độ Sinh Tồn."),
+                backgroundColor: _isSurvivalMode ? ThemeConfig.safeGreen : ThemeConfig.warningOrange,
+                duration: const Duration(seconds: 3),
+              ));
+            },
+          )
+        ],
+      ),
+
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'map',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MapScreen(isSurvivalMode: _isSurvivalMode))),
+            backgroundColor: ThemeConfig.sosRed.withValues(alpha: 0.2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: ThemeConfig.sosRed, width: 1.5),
+            ),
+            icon: const Icon(Icons.map, color: ThemeConfig.sosRed, size: 24),
+            label: const Text("BẢN ĐỒ CỘNG ĐỒNG",
+                style: TextStyle(
+                    color: ThemeConfig.sosRed,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
+            elevation: 0,
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: 'chat',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ChatScreen())),
+            backgroundColor: ThemeConfig.infoCyan.withValues(alpha: 0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: ThemeConfig.infoCyan, width: 1.5),
+            ),
+            icon: const Icon(Icons.smart_toy, color: ThemeConfig.infoCyan, size: 24),
+            label: const Text("HỎI TRỢ LÝ",
+                style: TextStyle(
+                    color: ThemeConfig.infoCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
+            elevation: 0,
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: 'weather',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const WeatherScreen())),
+            backgroundColor: ThemeConfig.warningOrange.withValues(alpha: 0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: ThemeConfig.warningOrange, width: 1.5),
+            ),
+            icon: const Icon(Icons.cloudy_snowing, color: ThemeConfig.warningOrange, size: 24),
+            label: const Text("DỰ BÁO LŨ",
+                style: TextStyle(
+                    color: ThemeConfig.warningOrange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
+            elevation: 0,
+          ),
+        ],
+      ),
+
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Hero Instruction
+              const Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Text(
+                  "Điền thông tin và bấm nút đỏ để gọi cứu hộ khẩn cấp.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: ThemeConfig.textSecondary, fontSize: 14),
+                ),
+              ),
+
+              // Bản đồ Glassmorphism
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: ThemeConfig.darkSurface,
+                  border: Border.all(
+                      color: _isLocationReady ? ThemeConfig.safeGreen.withValues(alpha: 0.5) : Colors.white12,
+                      width: 1.5),
+                  boxShadow: _isLocationReady 
+                    ? [BoxShadow(color: ThemeConfig.safeGreen.withValues(alpha: 0.2), blurRadius: 15, spreadRadius: 1)]
+                    : [],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Stack(
+                    children: [
+                      FlutterMap(
+                        mapController: _mapController,
+                        options: const MapOptions(
+                          initialCenter: LatLng(16.4637, 107.5909),
+                          initialZoom: 15.0,
+                          interactionOptions: InteractionOptions(
+                              flags: InteractiveFlag.all),
+                        ),
+                        children: [
+                          if (!_isSurvivalMode)
+                            TileLayer(
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName: 'com.floodsos.app'),
+                          if (_currentPosition != null)
+                            MarkerLayer(markers: [
+                              Marker(
+                                  point: LatLng(_currentPosition!.latitude,
+                                      _currentPosition!.longitude),
+                                  width: 40,
+                                  height: 40,
+                                  child: const Icon(Icons.my_location,
+                                      color: ThemeConfig.sosRed, size: 40))
+                            ]),
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            )
+                          ),
+                          padding: const EdgeInsets.fromLTRB(12, 20, 12, 10),
+                          child: Row(
+                            children: [
+                              Icon(Icons.location_on,
+                                  size: 16,
+                                  color: _isLocationReady
+                                      ? ThemeConfig.safeGreen
+                                      : ThemeConfig.warningOrange),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                  child: Text(_locationMessage,
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                                      overflow: TextOverflow.ellipsis)),
+                              if (!_isLocationReady)
+                                GestureDetector(
+                                  onTap: _determinePosition,
+                                  child: const Text("Thử lại",
+                                      style: TextStyle(
+                                          color: ThemeConfig.infoCyan,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13)),
+                                )
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Form nhập thông tin
+              _buildCustomTextField(
+                  _nameController, "Họ và tên", Icons.person, TextInputType.name),
+              const SizedBox(height: 16),
+              _buildCustomTextField(
+                  _phoneController, "Số điện thoại", Icons.phone, TextInputType.phone),
+              const SizedBox(height: 16),
+              _buildCustomTextField(
+                  _msgController, "Lời nhắn tình huống (tuỳ chọn)", Icons.edit_note, TextInputType.text),
+
+              const SizedBox(height: 24),
+
+              // Nút ghi âm
+              OutlinedButton.icon(
+                onPressed: _isRecording ? _stopRecording : _startRecording,
+                style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                  foregroundColor: WidgetStateProperty.all(_isRecording ? ThemeConfig.sosRed : ThemeConfig.infoCyan),
+                  side: WidgetStateProperty.all(BorderSide(color: _isRecording ? ThemeConfig.sosRed : ThemeConfig.infoCyan, width: 1.5)),
+                  overlayColor: WidgetStateProperty.all((_isRecording ? ThemeConfig.sosRed : ThemeConfig.infoCyan).withValues(alpha: 0.1)),
+                ),
+                icon: Icon(_isRecording ? Icons.stop_circle : Icons.mic_none, size: 24),
+                label: Text(
+                  _isRecording ? "Đang ghi âm... Chạm để dừng" : "Ghi âm mô tả khẩn cấp",
+                ),
+              ),
+
+              if (_audioFilePath != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: ThemeConfig.safeGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: ThemeConfig.safeGreen.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.audio_file,
+                          color: ThemeConfig.safeGreen, size: 20),
+                      const SizedBox(width: 10),
+                      const Text("Bản ghi âm đã sẵn sàng",
+                          style:
+                              TextStyle(color: ThemeConfig.safeGreen, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => setState(() => _audioFilePath = null),
+                        child: const Icon(Icons.delete_outline, color: ThemeConfig.sosRed, size: 22),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 32),
+
+              // Nút gửi SOS Hero
+              AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Container(
+                    height: 64,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThemeConfig.sosRed.withValues(alpha: 0.2 + (_pulseController.value * 0.4)),
+                          blurRadius: 15 + (_pulseController.value * 15),
+                          spreadRadius: _pulseController.value * 5,
+                        )
+                      ]
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _isSending ? null : _sendSOS,
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: ThemeConfig.sosGradient,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: _isSending
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                    color: Colors.white, strokeWidth: 3))
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.warning_rounded, size: 28, color: Colors.white),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    "GỬI TÍN HIỆU SOS",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.5),
+                                  ),
+                                ],
+                              ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              ),
+
+              const SizedBox(height: 80), // space for FAB
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField(TextEditingController controller,
+      String labelText, IconData icon, TextInputType keyboardType) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon),
       ),
     );
   }

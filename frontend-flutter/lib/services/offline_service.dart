@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,9 +68,9 @@ class OfflineService {
 
         // Xóa khỏi SQLite sau khi thành công
         await db.delete('pending_sos', where: 'id = ?', whereArgs: [sos.id]);
-        print("Đã đồng bộ SOS: ${sos.id}");
+        debugPrint("Đã đồng bộ SOS: ${sos.id}");
       } catch (e) {
-        print("Lỗi đồng bộ SOS ${map['id']}: $e");
+        debugPrint("Lỗi đồng bộ SOS ${map['id']}: $e");
       }
     }
   }

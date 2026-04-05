@@ -16,10 +16,16 @@ class PageHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThemeConfig.gray200),
-        boxShadow: ThemeConfig.cardShadow,
+        color: ThemeConfig.darkSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,8 +34,8 @@ class PageHeader extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: ThemeConfig.gray900,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
@@ -37,7 +43,7 @@ class PageHeader extends StatelessWidget {
             subtitle,
             style: const TextStyle(
               fontSize: 14,
-              color: ThemeConfig.gray500,
+              color: ThemeConfig.textSecondary,
             ),
           ),
         ],

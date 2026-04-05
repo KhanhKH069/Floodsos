@@ -1,4 +1,5 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter/foundation.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../services/api_service.dart'; // Lấy baseUrl từ đây cho đồng bộ
 
 class SocketService {
@@ -7,10 +8,10 @@ class SocketService {
   factory SocketService() => _instance;
   SocketService._internal();
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
 
   // Getter để các Provider khác có thể dùng socket này lắng nghe sự kiện
-  IO.Socket? get socket => _socket;
+  io.Socket? get socket => _socket;
 
   // Hàm khởi tạo kết nối
   void connect() {
@@ -21,12 +22,12 @@ class SocketService {
     // Lưu ý: Socket.io cần URL dạng 'http://IP:PORT', không cần /api/...
     final String socketUrl = ApiService.baseUrl;
 
-    print("🔌 SocketService: Đang kết nối tới $socketUrl");
+    debugPrint("🔌 SocketService: Đang kết nối tới $socketUrl");
 
     try {
-      _socket = IO.io(
+      _socket = io.io(
           socketUrl,
-          IO.OptionBuilder()
+          io.OptionBuilder()
               .setTransports(['websocket']) // Bắt buộc dùng WebSocket cho nhanh
               .disableAutoConnect() // Tắt tự động để kiểm soát thủ công
               .enableForceNew()
@@ -36,18 +37,18 @@ class SocketService {
 
       // --- LOG TRẠNG THÁI ---
       _socket!.onConnect((_) {
-        print('✅ Socket Connected! ID: ${_socket!.id}');
+        debugPrint('✅ Socket Connected! ID: ${_socket!.id}');
       });
 
       _socket!.onDisconnect((_) {
-        print('❌ Socket Disconnected');
+        debugPrint('❌ Socket Disconnected');
       });
 
       _socket!.onConnectError((err) {
-        print('⚠️ Socket Error: $err');
+        debugPrint('⚠️ Socket Error: $err');
       });
     } catch (e) {
-      print("💀 Lỗi khởi tạo Socket: $e");
+      debugPrint("💀 Lỗi khởi tạo Socket: $e");
     }
   }
 

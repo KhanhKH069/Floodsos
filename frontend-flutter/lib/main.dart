@@ -4,11 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 
 import 'config/app_config.dart';
-import 'providers/auth_provider.dart';
 import 'providers/sos_provider.dart';
 import 'providers/weather_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/voice_provider.dart';
+import 'providers/map_provider.dart';
 import 'services/socket_service.dart';
 import 'services/firebase_service.dart';
 import 'screens/home_screen.dart';
@@ -34,11 +34,11 @@ class FloodSOSApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SOSProvider()),
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => VoiceProvider()),
+        ChangeNotifierProvider(create: (_) => MapProvider()),
       ],
       child: MaterialApp(
         title: AppConfig.appName,

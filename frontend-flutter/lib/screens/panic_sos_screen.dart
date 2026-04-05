@@ -7,10 +7,10 @@ import '../services/firebase_service.dart';
 import 'sos_tracking_screen.dart';
 
 class PanicSOSScreen extends StatefulWidget {
-  const PanicSOSScreen({Key? key}) : super(key: key);
+  const PanicSOSScreen({super.key});
 
   @override
-  _PanicSOSScreenState createState() => _PanicSOSScreenState();
+  State<PanicSOSScreen> createState() => _PanicSOSScreenState();
 }
 
 class _PanicSOSScreenState extends State<PanicSOSScreen> {
@@ -21,7 +21,7 @@ class _PanicSOSScreenState extends State<PanicSOSScreen> {
     setState(() => _isSending = true);
 
     // Mock data (Thay bằng LocationService thật)
-    final mockLocation = FirebaseService.createGeoPoint(21.0285, 105.8542);
+    final mockLocation = FirebaseService.createGeoPoint(16.4637, 107.5909);
     final String newId = const Uuid().v4();
 
     final newSOS = SOSAlertModel(
@@ -66,7 +66,7 @@ class _PanicSOSScreenState extends State<PanicSOSScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text(
               FirebaseService.isSupported
                   ? 'Đang offline. SOS đã lưu và sẽ gửi khi có mạng!'

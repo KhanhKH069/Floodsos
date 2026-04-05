@@ -5,6 +5,7 @@ class DroneModel {
   final double longitude;
   final String status;
   final int battery;
+  final String? targetId; // ← MỚI: SOS target drone đang hướng đến
 
   DroneModel({
     required this.id,
@@ -13,16 +14,20 @@ class DroneModel {
     required this.longitude,
     required this.status,
     required this.battery,
+    this.targetId,
   });
 
   factory DroneModel.fromJson(Map<String, dynamic> json) {
     return DroneModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
       latitude: (json['lat'] ?? 0).toDouble(),
       longitude: (json['lon'] ?? 0).toDouble(),
-      status: json['status'],
-      battery: json['battery'],
+      status: json['status'] ?? 'idle',
+      battery: (json['battery'] ?? 100) is int
+          ? json['battery']
+          : (json['battery'] as num).toInt(),
+      targetId: json['targetId'],
     );
   }
 }

@@ -10,10 +10,10 @@ class SOSTrackingScreen extends StatelessWidget {
   final bool isOffline;
 
   const SOSTrackingScreen({
-    Key? key,
+    super.key,
     required this.sosId,
     this.isOffline = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class SOSTrackingScreen extends StatelessWidget {
     if (isOffline || !FirebaseService.isSupported) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             FirebaseService.isSupported
                 ? "Trạng thái SOS (Offline)"
                 : "SOS (Desktop Mode)",
@@ -31,17 +31,17 @@ class SOSTrackingScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_off, size: 80, color: Colors.grey),
-              SizedBox(height: 20),
-              Text(
+              const Icon(Icons.cloud_off, size: 80, color: Colors.grey),
+              const SizedBox(height: 20),
+              const Text(
                 FirebaseService.isSupported
                     ? "Đang chờ kết nối mạng để đồng bộ..."
                     : "🖥️ Running on Desktop - Firebase disabled",
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text("SOS ID: ${sosId.substring(0, 8)}",
-                  style: TextStyle(color: Colors.grey)),
+                  style: const TextStyle(color: Colors.grey)),
             ],
           ),
         ),
@@ -51,7 +51,7 @@ class SOSTrackingScreen extends StatelessWidget {
     // Mobile/Web: Real-time tracking
     final stream = FirebaseService.sosStream(sosId);
     if (stream == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(child: Text("Unable to load SOS data")),
       );
     }

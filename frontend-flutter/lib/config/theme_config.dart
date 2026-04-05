@@ -1,179 +1,141 @@
-//lib/config/theme_config.dart
+// lib/config/theme_config.dart
 import 'package:flutter/material.dart';
 
 class ThemeConfig {
-  // Exact Tailwind colors
-  static const Color gray50 = Color(0xFFF9FAFB);
-  static const Color gray100 = Color(0xFFF5F5F5);
-  static const Color gray200 = Color(0xFFE5E7EB);
-  static const Color gray300 = Color(0xFFD1D5DB);
-  static const Color gray400 = Color(0xFF9CA3AF);
-  static const Color gray500 = Color(0xFF6B7280);
-  static const Color gray600 = Color(0xFF4B5563);
-  static const Color gray700 = Color(0xFF374151);
-  static const Color gray800 = Color(0xFF1F2937);
-  static const Color gray900 = Color(0xFF111827);
+  // Option A: Dark Emergency Theme Colors
+  static const Color darkBackground = Color(0xFF0D1117);
+  static const Color darkSurface = Color(0xFF161B22);
+  static const Color darkSurfaceLight = Color(0xFF21262D);
+  
+  static const Color sosRed = Color(0xFFFF3B30);
+  static const Color sosRedDark = Color(0xFFBB2B22);
+  static const Color infoCyan = Color(0xFF00D4FF);
+  
+  static const Color safeGreen = Color(0xFF34C759);
+  static const Color warningOrange = Color(0xFFFF9F0A);
 
-  static const Color blue50 = Color(0xFFEFF6FF);
-  static const Color blue100 = Color(0xFFDBEAFE);
-  static const Color blue500 = Color(0xFF3B82F6);
-  static const Color blue600 = Color(0xFF2563EB);
-  static const Color blue700 = Color(0xFF1D4ED8);
+  static const Color textPrimary = Colors.white;
+  static const Color textSecondary = Color(0xFF8B949E);
 
-  static const Color red50 = Color(0xFFFEF2F2);
-  static const Color red100 = Color(0xFFFEE2E2);
-  static const Color red500 = Color(0xFFEF4444);
-  static const Color red600 = Color(0xFFDC2626);
-
-  static const Color green50 = Color(0xFFF0FDF4);
-  static const Color green100 = Color(0xFFDCFCE7);
-  static const Color green500 = Color(0xFF10B981);
-  static const Color green600 = Color(0xFF059669);
-
-  static const Color yellow50 = Color(0xFFFEF3C7);
-  static const Color yellow100 = Color(0xFFFEF08A);
-  static const Color yellow500 = Color(0xFFFBBF24);
-  static const Color yellow600 = Color(0xFFD97706);
-
-  static const Color purple50 = Color(0xFFFAF5FF);
-  static const Color purple100 = Color(0xFFF3E8FF);
-
-  // Legacy colors
-  static const Color primaryColor = blue600;
-  static const Color primaryDark = blue700;
-  static const Color dangerColor = red500;
-  static const Color dangerDark = red600;
-  static const Color warningColor = yellow500;
-  static const Color safeColor = green500;
-  static const Color backgroundColor = gray100;
-  static const Color cardColor = Colors.white;
-  static const Color textPrimary = gray900;
-  static const Color textSecondary = gray500;
+  // Legacy compat aliases (to prevent immediate build breaks in other files)
+  static const Color primaryColor = sosRed;
+  static const Color dangerColor = sosRed;
+  static const Color safeColor = safeGreen;
+  static const Color warningColor = warningOrange;
+  static const Color backgroundColor = darkBackground;
 
   // Gradients
-  static const LinearGradient dangerGradient = LinearGradient(
-    colors: [red600, red500],
+  static const LinearGradient sosGradient = LinearGradient(
+    colors: [sosRed, sosRedDark],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [blue700, blue500],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    colors: [Color(0xFF21262D), Color(0xFF161B22)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
   );
 
-  static ThemeData lightTheme = ThemeData(
-    primaryColor: primaryColor,
-    scaffoldBackgroundColor: backgroundColor,
+  // Default Dark Theme Setup
+  static ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: sosRed,
+    scaffoldBackgroundColor: darkBackground,
+    fontFamily: 'Roboto', // Change to standard sans-serif
     appBarTheme: const AppBarTheme(
       elevation: 0,
-      backgroundColor: primaryColor,
-      foregroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      foregroundColor: textPrimary,
       centerTitle: true,
       titleTextStyle: TextStyle(
         fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
+        fontWeight: FontWeight.w700,
+        color: textPrimary,
+        letterSpacing: 1.2,
       ),
     ),
     cardTheme: CardThemeData(
       elevation: 0,
-      color: cardColor,
+      color: Colors.white.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: gray200),
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.white12),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        elevation: 0,
+        backgroundColor: sosRed,
+        foregroundColor: Colors.white,
+        elevation: 8,
+        shadowColor: sosRed.withValues(alpha: 0.5),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(14),
         ),
         textStyle: const TextStyle(
           fontSize: 16,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: infoCyan,
+        side: const BorderSide(color: infoCyan, width: 1.5),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      filled: false,
+      filled: true,
+      fillColor: Colors.white.withValues(alpha: 0.05),
+      labelStyle: const TextStyle(color: textSecondary),
+      prefixIconColor: infoCyan,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: gray200),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.white12, width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: gray200),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.white12, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: primaryColor, width: 2),
-      ),
-      contentPadding: const EdgeInsets.all(14),
-    ),
-  );
-
-  static ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primaryColor: primaryColor,
-    scaffoldBackgroundColor: gray900,
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      backgroundColor: gray800,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-    ),
-    cardTheme: CardThemeData(
-      elevation: 0,
-      color: gray800,
-      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: gray700),
+        borderSide: const BorderSide(color: infoCyan, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: sosRed, width: 1.5),
       ),
     ),
   );
 
-  // Common shadow for cards
-  static List<BoxShadow> get cardShadow => [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
-          blurRadius: 4,
-          offset: const Offset(0, 1),
-        ),
-      ];
-
-  // Status colors helper
   static Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return red500;
+      case 'critical':
+      case 'khẩn cấp':
+      case 'cao':
+        return sosRed;
       case 'responding':
-        return yellow500;
+      case 'warning':
+      case 'trung bình':
+        return warningOrange;
       case 'resolved':
-        return green500;
+      case 'safe':
+      case 'an toàn':
+        return safeGreen;
       default:
-        return gray500;
-    }
-  }
-
-  static Color getStatusBgColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return red50;
-      case 'responding':
-        return yellow50;
-      case 'resolved':
-        return green50;
-      default:
-        return gray50;
+        return textSecondary;
     }
   }
 }

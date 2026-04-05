@@ -39,8 +39,8 @@ class _VoiceSOSScreenState extends State<VoiceSOSScreen> {
     // Send Voice SOS
     final success = await sos.sendVoiceSOS(
       deviceId: 'MOBILE-${DateTime.now().millisecondsSinceEpoch}',
-      latitude: location.latitude ?? 21.0285,
-      longitude: location.longitude ?? 105.8542,
+      latitude: location.latitude ?? 16.4637,
+      longitude: location.longitude ?? 107.5909,
       battery: 100,
       audioFilePath: voice.audioFilePath!,
     );
