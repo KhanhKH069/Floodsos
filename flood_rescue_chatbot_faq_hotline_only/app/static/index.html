@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flood FAQ + Hotline Chatbot</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="layout">
+    <div class="card chat-card">
+      <div class="chat-header">
+        <div>
+          <h1>Flood FAQ + Hotline Chatbot</h1>
+          <p>Hỗ trợ FAQ an toàn lũ lụt và tra cứu hotline cứu trợ, công an, cứu thương</p>
+        </div>
+      </div>
+
+      <div id="messages" class="messages"></div>
+
+      <div id="suggestions" class="suggestions"></div>
+
+      <form id="chat-form" class="chat-form">
+        <input id="message-input" type="text" placeholder="Nhập câu hỏi, ví dụ: Mất điện khi nhà đang ngập phải làm sao? hoặc Hotline cứu trợ Hà Nội" autocomplete="off" />
+        <button type="submit">Gửi</button>
+      </form>
+    </div>
+
+    <div class="card side-card">
+      <h2>Gợi ý sử dụng</h2>
+      <ul>
+        <li>Hotline cứu trợ Hà Nội</li>
+        <li>Số cứu thương Đà Nẵng</li>
+        <li>Công an hỗ trợ TP.HCM</li>
+        <li>Mất điện khi nhà đang ngập phải làm sao?</li>
+        <li>Nước lũ dính vào vết thương có nguy hiểm không?</li>
+      </ul>
+      <div class="note">
+        Bot này chỉ giữ lại hai chức năng: FAQ và hotline. Không tiếp nhận tạo phiếu cứu hộ, không có admin và không theo dõi mã yêu cầu.
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

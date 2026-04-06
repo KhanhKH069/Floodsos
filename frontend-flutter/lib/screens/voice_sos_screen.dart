@@ -34,14 +34,22 @@ class _VoiceSOSScreenState extends State<VoiceSOSScreen> {
     await location.updateLocation();
 
     if (voice.audioFilePath == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Bạn chưa ghi âm lời nhắn nào để gửi SOS!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
       return;
     }
 
     // Send Voice SOS
+    final ngheAn = LocationProvider.sessionPoint;
     final success = await sos.sendVoiceSOS(
       deviceId: 'MOBILE-${DateTime.now().millisecondsSinceEpoch}',
-      latitude: location.latitude ?? 19.3400,
-      longitude: location.longitude ?? 105.7100,
+      latitude: location.latitude ?? ngheAn.latitude,
+      longitude: location.longitude ?? ngheAn.longitude,
       battery: 100,
       audioFilePath: voice.audioFilePath!,
     );
@@ -64,8 +72,8 @@ class _VoiceSOSScreenState extends State<VoiceSOSScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => SOSRoutingResultScreen(
-            lat: location.latitude ?? 19.3400,
-            lon: location.longitude ?? 105.7100,
+            lat: location.latitude ?? ngheAn.latitude,
+            lon: location.longitude ?? ngheAn.longitude,
           ),
         ),
       );

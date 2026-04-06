@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/sos_alert_model.dart';
+import '../models/flood_zone_model.dart';
 
 class ApiService {
   static String get _backendUrl {
@@ -39,12 +40,14 @@ class ApiService {
       );
       return res.data as Map<String, dynamic>;
     } on DioException catch (e) {
+      debugPrint("DioException in login: ${e.message} ${e.response?.statusCode} ${e.error}");
       if (e.response?.statusCode == 401) {
         return {'success': false, 'message': 'Sai tài khoản hoặc mật khẩu'};
       }
-      return {'success': false, 'message': 'Lỗi kết nối Server'};
-    } catch (_) {
-      return {'success': false, 'message': 'Lỗi kết nối Server'};
+      return {'success': false, 'message': 'Lỗi kết nối Server: ${e.message}'};
+    } catch (e) {
+      debugPrint("Other Exception in login: $e");
+      return {'success': false, 'message': 'Lỗi kết nối Server: $e'};
     }
   }
 
@@ -62,6 +65,10 @@ class ApiService {
       final res = await _dio.post(
         '$_backendUrl/api/chat',
         data: {'message': message},
+        options: Options(
+          sendTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 5),
+        )
       );
       return (res.data as Map<String, dynamic>)['reply'] ?? "Lỗi phản hồi.";
     } catch (e) {
@@ -144,28 +151,34 @@ class ApiService {
     }
   }
 
-  // ─── WEATHER ─────────────────────────────────────────────────────────────
+  // ─── WEATHER (OPEN-METEO) ────────────────────────────────────────────────
 
   Future<Map<String, dynamic>> getWeather(double lat, double lon) async {
     try {
       final res = await _dio.get(
-        'https://api.openweathermap.org/data/2.5/weather',
+        'https://api.open-meteo.com/v1/forecast',
         queryParameters: {
-          'lat': lat, 'lon': lon,
-          'appid': _owmKey, 'units': 'metric', 'lang': 'vi'
+          'latitude': lat,
+          'longitude': lon,
+          'current': 'temperature_2m,relative_humidity_2m,precipitation,weather_code',
+          'timezone': 'Asia/Bangkok'
         },
       );
-      final data = res.data as Map<String, dynamic>;
-      double rain = 0.0;
-      if (data['rain'] != null && data['rain']['1h'] != null) {
-        rain = double.tryParse(data['rain']['1h'].toString()) ?? 0.0;
-      }
+      final current = res.data['current'] as Map<String, dynamic>;
+      
+      double rain = double.tryParse(current['precipitation']?.toString() ?? '0') ?? 0.0;
+      double temp = double.tryParse(current['temperature_2m']?.toString() ?? '0') ?? 0.0;
+      int humidity = int.tryParse(current['relative_humidity_2m']?.toString() ?? '0') ?? 0;
+      int code = int.tryParse(current['weather_code']?.toString() ?? '0') ?? 0;
+      
+      String desc = _mapWmoToDesc(code);
+      
       return {
-        'temp': data['main']['temp'],
-        'humidity': data['main']['humidity'],
+        'temp': temp,
+        'humidity': humidity,
         'rain': rain,
-        'desc': data['weather'][0]['description'],
-        'location': data['name'],
+        'desc': desc,
+        'location': 'Vị trí hiện tại',
         'floodRisk': rain > 50 ? 'Nguy cơ lũ cao' : (rain > 10 ? 'Mưa vừa' : 'An toàn'),
         'riskColor': rain > 50 ? 'red' : (rain > 10 ? 'orange' : 'green'),
       };
@@ -181,34 +194,57 @@ class ApiService {
   Future<Map<String, dynamic>> getForecast(double lat, double lon) async {
     try {
       final res = await _dio.get(
-        'https://api.openweathermap.org/data/2.5/forecast',
+        'https://api.open-meteo.com/v1/forecast',
         queryParameters: {
-          'lat': lat, 'lon': lon,
-          'appid': _owmKey, 'units': 'metric', 'lang': 'vi'
+          'latitude': lat,
+          'longitude': lon,
+          'hourly': 'temperature_2m,precipitation,weather_code',
+          'timezone': 'Asia/Bangkok',
+          'forecast_days': 2
         },
       );
-      final list = (res.data as Map<String, dynamic>)['list'] as List;
-      final forecast = list.take(8).map((item) {
-        double rain = 0.0;
-        if (item['rain'] != null && item['rain']['3h'] != null) {
-          rain = double.tryParse(item['rain']['3h'].toString()) ?? 0.0;
+      
+      final hourly = res.data['hourly'] as Map<String, dynamic>;
+      final times = hourly['time'] as List;
+      final temps = hourly['temperature_2m'] as List;
+      final rains = hourly['precipitation'] as List;
+      final codes = hourly['weather_code'] as List;
+      
+      List<Map<String, dynamic>> forecast = [];
+      DateTime now = DateTime.now();
+      
+      for (int i = 0; i < times.length; i++) {
+        DateTime t = DateTime.parse(times[i].toString());
+        if (t.isAfter(now) || (t.hour == now.hour && t.day == now.day)) {
+          forecast.add({
+            'time': '${t.hour.toString().padLeft(2, '0')}:00',
+            'temp': temps[i],
+            'rain': rains[i],
+            'desc': _mapWmoToDesc(int.tryParse(codes[i]?.toString() ?? '0') ?? 0),
+          });
+          if (forecast.length == 8) break;
         }
-        final date = DateTime.fromMillisecondsSinceEpoch(
-            (item['dt'] as int) * 1000).toLocal();
-        return {
-          'time': '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}',
-          'temp': item['main']['temp'],
-          'rain': rain,
-          'desc': item['weather'][0]['description'],
-        };
-      }).toList();
+      }
+      
       return {
         'forecast': forecast,
-        'alert': {'level': 'normal', 'message': 'Không có cảnh báo đặc biệt'},
+        'alert': {'level': 'normal', 'message': 'Đã cập nhật dữ liệu từ Open-Meteo'},
       };
     } catch (_) {
       return {};
     }
+  }
+
+  static String _mapWmoToDesc(int code) {
+    if (code == 0) return 'Quang mây';
+    if (code == 1 || code == 2 || code == 3) return 'Có mây';
+    if (code == 45 || code == 48) return 'Sương mù';
+    if (code >= 51 && code <= 55) return 'Mưa phùn';
+    if (code >= 61 && code <= 65) return 'Mưa rào';
+    if (code >= 71 && code <= 77) return 'Tuyết rơi';
+    if (code >= 80 && code <= 82) return 'Mưa lớn';
+    if (code >= 95 && code <= 99) return 'Mưa dông';
+    return 'Thời tiết xấu';
   }
 
   Future<String?> lookupNameByPhone(String p) async => null;
@@ -219,11 +255,63 @@ class ApiService {
       final res = await _dio.post(
         '$_backendUrl/api/sos/route',
         data: {'lat': lat, 'lon': lon},
-        options: Options(receiveTimeout: const Duration(seconds: 25)),
+        options: Options(receiveTimeout: const Duration(seconds: 60)),
       );
       return res.data as Map<String, dynamic>;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Lấy danh sách điểm ngập lụt (bản đồ ngập) từ backend.
+  Future<List<FloodZoneModel>> getFloodZones() async {
+    try {
+      final res = await _dio.get(
+        '$_backendUrl/api/flood-zones',
+        options: Options(receiveTimeout: const Duration(seconds: 10)),
+      );
+      return (res.data as List)
+          .map((x) => FloodZoneModel.fromJson(x as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('getFloodZones error: $e');
+      return [];
+    }
+  }
+
+  // ─── COMMUNITY RESCUE (Volunteer) ─────────────────────────────────────────
+
+  Future<bool> volunteerAccept({
+    required String sosId,
+    required String volunteerName,
+    required String volunteerPhone,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '$_backendUrl/api/sos/$sosId/volunteer/accept',
+        data: {'volunteerName': volunteerName, 'volunteerPhone': volunteerPhone},
+      );
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> volunteerArrive({required String sosId}) async {
+    try {
+      final res = await _dio.post('$_backendUrl/api/sos/$sosId/volunteer/arrive');
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> volunteerComplete({required String sosId}) async {
+    try {
+      final res = await _dio.post('$_backendUrl/api/sos/$sosId/volunteer/complete');
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
     }
   }
 }

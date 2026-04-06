@@ -29,7 +29,7 @@ async function fetchUrgencyScore({ lat, lon, flood_prob_near, people_count = 1, 
 async function fetchRouteAnalysis({ lat, lon }) {
     try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000); // OSM có thể chậm hơn
+        const timer = setTimeout(() => controller.abort(), 60000); // Tăng lên 60s vì OSRM tốn ~25-30s
         const res = await fetch(ROUTING_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

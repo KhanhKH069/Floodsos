@@ -75,6 +75,22 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
     // Nếu rớt mạng (null), lập tức vọt sang Chip AI TFLite Offline
     final finalData = networkData ?? await OfflineRoutingService.getOfflineAIPath(_currentLat!, _currentLon!);
     
+    // Lấy detail points (men theo đường) từ OSRM cho từng chặng
+    if (finalData['segments'] != null) {
+      final segs = finalData['segments'] as List;
+      for (var seg in segs) {
+        final from = seg['from_point'] as List?;
+        final to   = seg['to_point']   as List?;
+        if (from != null && to != null && from.length >= 2 && to.length >= 2) {
+          final start = LatLng(double.tryParse(from[0].toString()) ?? 0.0, double.tryParse(from[1].toString()) ?? 0.0);
+          final end = LatLng(double.tryParse(to[0].toString()) ?? 0.0, double.tryParse(to[1].toString()) ?? 0.0);
+          if (start.latitude != end.latitude || start.longitude != end.longitude) {
+            seg['detailed_points'] = await RouteHelper.getRoadRoute(start, end);
+          }
+        }
+      }
+    }
+
     if (!mounted) return;
     setState(() {
       _result  = finalData;
@@ -200,11 +216,21 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
   }
 
   List<LatLng> get _routePoints {
+    final List<LatLng> allDetailed = [];
+    if (_result?['segments'] != null) {
+      for (var seg in _result!['segments']) {
+        if (seg['detailed_points'] != null) {
+          allDetailed.addAll(seg['detailed_points'] as List<LatLng>);
+        }
+      }
+    }
+    if (allDetailed.isNotEmpty) return allDetailed;
+
     final routeRaw = _result?['route'] as List?;
     if (routeRaw == null) return [];
     return routeRaw.map<LatLng>((pt) {
       final p = pt as List;
-      return LatLng((p[0] as num).toDouble(), (p[1] as num).toDouble());
+      return LatLng(double.tryParse(p[0].toString()) ?? 0.0, double.tryParse(p[1].toString()) ?? 0.0);
     }).toList();
   }
 
@@ -284,9 +310,9 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
       );
 
   Widget _buildResult(bool isHigh, Color accent) {
-    final floodProb = (_result?['flood_prob'] as num?)?.toDouble();
     final summary = _result?['summary'] as String? ?? '';
-    final totalKm = (_result?['total_distance_km'] as num?)?.toDouble() ?? 0.0;
+    final floodProb = double.tryParse(_result?['flood_prob']?.toString() ?? '');
+    final totalKm = double.tryParse(_result?['total_distance_km']?.toString() ?? '') ?? 0.0;
 
     return SingleChildScrollView(
       child: Column(
@@ -462,12 +488,15 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
     }
     final level = seg['flood_level'] as String? ?? 'none';
     final color = _segmentColor(level);
+    
+    final detailPoints = seg['detailed_points'] as List<LatLng>?;
+
     return PolylineLayer(
       polylines: [
         Polyline(
-          points: [
-            LatLng((from[0] as num).toDouble(), (from[1] as num).toDouble()),
-            LatLng((to[0] as num).toDouble(), (to[1] as num).toDouble()),
+          points: detailPoints ?? [
+            LatLng(double.tryParse(from[0].toString()) ?? 0.0, double.tryParse(from[1].toString()) ?? 0.0),
+            LatLng(double.tryParse(to[0].toString()) ?? 0.0, double.tryParse(to[1].toString()) ?? 0.0),
           ],
           color: color,
           strokeWidth: 5,
@@ -512,9 +541,10 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
   Widget _buildShelterCard(Color accent) {
     final sh = _result!['shelter'] as Map<String, dynamic>;
     final name = sh['name'] as String? ?? 'Điểm trú ẩn';
-    final dist = (sh['distance_km'] as num?)?.toStringAsFixed(1) ?? '?';
-    final lat  = (sh['lat'] as num?)?.toDouble();
-    final lon  = (sh['lon'] as num?)?.toDouble();
+    final distParam = double.tryParse(sh['distance_km']?.toString() ?? '');
+    final dist = distParam != null ? distParam.toStringAsFixed(1) : '?';
+    final lat  = double.tryParse(sh['lat']?.toString() ?? '');
+    final lon  = double.tryParse(sh['lon']?.toString() ?? '');
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 10, 12, 0),
@@ -562,8 +592,8 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
     final rb = _result!['rescue_base'] as Map<String, dynamic>;
     final source = rb['source'] as String? ?? '';
     final srcLabel = source == 'base_json' ? 'Trạm cứu hộ' : 'Điểm xuất phát (shelter)';
-    final lat = (rb['lat'] as num?)?.toDouble();
-    final lon = (rb['lon'] as num?)?.toDouble();
+    final lat = double.tryParse(rb['lat']?.toString() ?? '');
+    final lon = double.tryParse(rb['lon']?.toString() ?? '');
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 10, 12, 0),
@@ -606,8 +636,9 @@ class _SOSRoutingResultScreenState extends State<SOSRoutingResultScreen> {
   Widget _buildSegmentCard(dynamic seg, int index) {
     final level   = seg['flood_level']   as String? ?? 'none';
     final plan    = seg['plan']          as String? ?? '';
-    final distKm  = (seg['distance_km'] as num?)?.toStringAsFixed(2) ?? '?';
-    final prob    = (seg['flood_prob_avg'] as num?)?.toDouble() ?? 0.0;
+    final distParam = double.tryParse(seg['distance_km']?.toString() ?? '');
+    final distKm  = distParam != null ? distParam.toStringAsFixed(2) : '?';
+    final prob    = double.tryParse(seg['flood_prob_avg']?.toString() ?? '') ?? 0.0;
     final segColor = _segmentColor(level);
 
     return Container(

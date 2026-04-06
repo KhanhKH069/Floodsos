@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:latlong2/latlong.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class RouteHelper {
   static const double earthRadius = 6371000; // Bán kính trái đất (mét)
@@ -57,5 +59,28 @@ class RouteHelper {
       if (dist < minDistance) minDistance = dist;
     }
     return minDistance;
+  }
+
+  /// 3. Lấy tọa độ đường bộ từ OSRM (để vẽ men theo đường thay vì chim bay)
+  static Future<List<LatLng>> getRoadRoute(LatLng start, LatLng end) async {
+    try {
+      final dio = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5)));
+      final url = 'https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson';
+      debugPrint('Calling OSRM: $url');
+      final response = await dio.get(url);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['routes'] != null && data['routes'].isNotEmpty) {
+          final coordinates = data['routes'][0]['geometry']['coordinates'] as List;
+          debugPrint('OSRM success, got ${coordinates.length} points for segment.');
+          return coordinates.map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble())).toList();
+        }
+      } else {
+        debugPrint('OSRM failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('OSRM Error: $e');
+    }
+    return [start, end]; // Fallback về đường chim bay nếu lỗi mạng hoặc OSRM sập
   }
 }

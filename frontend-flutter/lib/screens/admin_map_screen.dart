@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/sos_alert_model.dart';
 import '../services/api_service.dart';
+import '../services/offline_service.dart';
 import '../utils/cached_tile_provider.dart';
 
 class AdminMapScreen extends StatefulWidget {
@@ -47,7 +48,14 @@ class _AdminMapScreenState extends State<AdminMapScreen> {
 
   Future<void> _loadData() async {
     try {
-      final alerts = await _apiService.getSOSAlerts();
+      var alerts = await _apiService.getSOSAlerts();
+      
+      // Nếu API trả về rỗng (như khi rớt mạng/server down), thử kéo data từ Local SQLite
+      if (alerts.isEmpty) {
+        final offlineMaps = await OfflineService().getPendingSOSList();
+        alerts = offlineMaps.map((m) => SOSAlertModel.fromJson(m)).toList();
+      }
+
       if (mounted) {
         setState(() {
           _alerts = alerts

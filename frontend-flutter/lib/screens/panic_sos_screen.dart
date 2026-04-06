@@ -1,7 +1,10 @@
 // lib/screens/panic_sos_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../models/sos_model.dart';
+import '../providers/sos_provider.dart';
+import '../providers/location_provider.dart';
 import '../services/offline_service.dart';
 import '../services/firebase_service.dart';
 import '../services/mesh_service.dart';
@@ -21,8 +24,10 @@ class _PanicSOSScreenState extends State<PanicSOSScreen> {
   Future<void> _handleEmergencySOS() async {
     setState(() => _isSending = true);
 
-    // Mock data (Thay bằng LocationService thật)
-    final mockLocation = FirebaseService.createGeoPoint(21.0285, 105.8542);
+    // Dùng điểm Nghệ An đã chọn cho session (nhất quán toàn app)
+    final point = LocationProvider.sessionPoint;
+    final mockLocation = FirebaseService.createGeoPoint(
+        point.latitude, point.longitude);
     final String newId = const Uuid().v4();
 
     final newSOS = SOSAlertModel(
@@ -43,13 +48,29 @@ class _PanicSOSScreenState extends State<PanicSOSScreen> {
     );
 
     try {
-      // 1. Thử gửi lên Firestore (nếu có)
-      if (FirebaseService.isSupported) {
-        await FirebaseService.saveSOS(newId, newSOS.toMap())
-            .timeout(const Duration(seconds: 3));
-      } else {
-        // Desktop: Chỉ lưu local
-        throw Exception('Desktop mode - no Firebase');
+      // 1. Gửi lên hệ thống Server Backend bằng Provider
+      final location = context.read<LocationProvider>();
+      // Ưu tiên GPS thật, nếu không có dùng điểm Nghệ An đã chọn cho session
+      double lat = location.latitude ?? point.latitude;
+      double lon = location.longitude ?? point.longitude;
+
+      final success = await context.read<SOSProvider>().sendTextSOS(
+        deviceId: 'PANIC-${newId.substring(0, 8)}',
+        latitude: lat,
+        longitude: lon,
+        battery: 100,
+        message: '🚨 KHẨN CẤP: Nút Panic SOS được kích hoạt!',
+        messageIndex: 1,
+      );
+
+      if (!success) {
+        // Nếu Backend fail, thử gửi qua Firebase Backup
+        if (FirebaseService.isSupported) {
+          await FirebaseService.saveSOS(newId, newSOS.toMap())
+              .timeout(const Duration(seconds: 3));
+        } else {
+          throw Exception('Backend and Firebase both failed');
+        }
       }
 
       // 2. Thành công -> Chuyển màn hình tracking

@@ -1,5 +1,6 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:geolocator/geolocator.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,6 +8,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+
+import '../providers/location_provider.dart';
 
 import '../services/api_service.dart';
 import '../widgets/weather_info_widget.dart';
@@ -34,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Position? _currentPosition;
   String _locationMessage = "Đang lấy vị trí...";
   bool _isLocationReady = false;
+  bool _isSimulated = false;          // đang dùng vị trí giả lập Nghệ An
   int _currentTab = 0;
 
   // ─── Form ──────────────────────────────────────────────
@@ -57,7 +61,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _determinePosition();
+    // Đợi frame đầu tiên build xong (map widget sẵn sàng) rồi mới lấy vị trí
+    WidgetsBinding.instance.addPostFrameCallback((_) => _determinePosition());
 
     // Pulse scale on SOS button
     _pulseCtrl = AnimationController(
@@ -93,32 +98,59 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // ─── Location ──────────────────────────────────────────
   Future<void> _determinePosition() async {
+    // ── Trên Desktop (Windows/Linux/Mac): Windows Location Services
+    // ── thường trả về vị trí IP không chính xác → dùng thẳng Nghệ An.
+    if (!kIsWeb && Platform.isWindows) {
+      _applyNgheAnFallback();
+      return;
+    }
+
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      setState(() => _locationMessage = "Hãy bật GPS!");
+      _applyNgheAnFallback();
       return;
     }
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() => _locationMessage = "Cần quyền vị trí!");
-        return;
-      }
+    }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      _applyNgheAnFallback();
+      return;
     }
     try {
       Position pos = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
+      // Kiểm tra nếu tọa độ nằm ngoài Nghệ An (app demo) → dùng Nghệ An
+      final inNgheAn = pos.latitude >= 18.5 && pos.latitude <= 20.0 &&
+                       pos.longitude >= 104.0 && pos.longitude <= 106.5;
+      if (!inNgheAn) {
+        _applyNgheAnFallback();
+        return;
+      }
       setState(() {
         _currentPosition = pos;
         _locationMessage =
             "${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}";
         _isLocationReady = true;
+        _isSimulated = false;
       });
       _mapController.move(LatLng(pos.latitude, pos.longitude), 15.0);
-    } catch (e) {
-      setState(() => _locationMessage = "Lỗi vị trí: $e");
+    } catch (_) {
+      _applyNgheAnFallback();
     }
+  }
+
+  /// Áp dụng ngay 1 trong 7 tọa độ Nghệ An (nhất quán cả session)
+  void _applyNgheAnFallback() {
+    final point = LocationProvider.sessionPoint;
+    setState(() {
+      _isSimulated = true;
+      _locationMessage = '📍 ${point.name}';
+      _isLocationReady = true;
+    });
+    _mapController.move(LatLng(point.latitude, point.longitude), 13.0);
   }
 
   // ─── Audio ─────────────────────────────────────────────
@@ -161,23 +193,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   // ─── SOS ───────────────────────────────────────────────
   Future<void> _sendSOS() async {
+    // 1. Phục hồi yêu cầu điền Name & Phone theo yêu cầu của User
     if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Nhập tên & SĐT!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Bắt buộc nhập Tên & SĐT để đội cứu hộ liên lạc!")),
+      );
       return;
     }
-    if (_currentPosition == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Chưa có vị trí!")));
-      return;
-    }
+
+    // 2. Nếu không có GPS thật → dùng điểm Nghệ An đã chọn cho session này
+    double lat = _currentPosition?.latitude ?? LocationProvider.sessionPoint.latitude;
+    double lon = _currentPosition?.longitude ?? LocationProvider.sessionPoint.longitude;
+
     setState(() => _isSending = true);
     Map<String, dynamic> result;
     if (_audioFilePath != null && File(_audioFilePath!).existsSync()) {
       result = await _apiService.sendVoiceSOS(
         deviceId: 'home',
-        latitude: _currentPosition!.latitude,
-        longitude: _currentPosition!.longitude,
+        latitude: lat,
+        longitude: lon,
         battery: 100,
         audioFilePath: _audioFilePath!,
         name: _nameController.text,
@@ -189,8 +223,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     } else {
       result = await _apiService.sendTextSOS({
-        'lat': _currentPosition!.latitude.toString(),
-        'lon': _currentPosition!.longitude.toString(),
+        'lat': lat.toString(),
+        'lon': lon.toString(),
         'name': _nameController.text,
         'phone': _phoneController.text,
         'message':
@@ -212,17 +246,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         context,
         MaterialPageRoute(
           builder: (_) => SOSRoutingResultScreen(
-            lat: _currentPosition!.latitude,
-            lon: _currentPosition!.longitude,
-            urgencyProb: (result['urgency_prob'] as num?)?.toDouble(),
+            lat: lat,
+            lon: lon,
+            urgencyProb: double.tryParse(result['urgency_prob']?.toString() ?? ''),
             isUrgent: result['is_urgent'] as bool?,
           ),
         ),
       );
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Lỗi gửi tin!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Hoạt động Ngoại tuyến: Đã xếp hàng chờ gửi!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      // Vẫn chuyển màn hình ở chế độ Offline thay vì kẹt lại
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SOSRoutingResultScreen(
+            lat: lat,
+            lon: lon,
+            urgencyProb: 0.75, // Mock probability offline
+            isUrgent: true,    // Mock status offline
+          ),
+        ),
+      );
     }
   }
 
@@ -402,9 +452,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
-          SizedBox(
-            width: 180,
-            height: 180,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(width: 8),
+              Expanded(
+                child: Image.asset('assets/images/logoo.png', height: 160, fit: BoxFit.contain),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 180,
+                height: 180,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -458,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: child,
                   ),
                   child: GestureDetector(
-                    onTap: (_isSending || !_isLocationReady) ? null : _sendSOS,
+                    onTap: _isSending ? null : _sendSOS,
                     child: Container(
                       width: 100,
                       height: 100,
@@ -501,7 +559,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Image.asset('assets/images/logoptit.png', height: 160, fit: BoxFit.contain),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
             _isSending
                 ? 'Đang gửi...'
@@ -566,11 +631,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildMiniMap() {
+    // Xác định marker point để hiển thị
+    final markerPoint = _currentPosition != null
+        ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
+        : (_isSimulated
+            ? LatLng(LocationProvider.sessionPoint.latitude,
+                LocationProvider.sessionPoint.longitude)
+            : null);
+
     return GlassCard(
       padding: const EdgeInsets.all(0),
       borderRadius: 20,
       borderColor: _isLocationReady
-          ? ThemeConfig.teal.withValues(alpha: 0.5)
+          ? (_isSimulated
+              ? Colors.orange.withValues(alpha: 0.5)
+              : ThemeConfig.teal.withValues(alpha: 0.5))
           : ThemeConfig.glassBorder,
       margin: const EdgeInsets.only(bottom: 12),
       child: ClipRRect(
@@ -581,11 +656,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               FlutterMap(
                 mapController: _mapController,
-                options: const MapOptions(
-                  initialCenter: LatLng(19.3400, 105.7100),
-                  initialZoom: 15.0,
+                options: MapOptions(
+                  initialCenter: markerPoint ?? const LatLng(18.6796, 105.6813),
+                  initialZoom: _isSimulated ? 13.0 : 15.0,
                   interactionOptions:
-                      InteractionOptions(flags: InteractiveFlag.all),
+                      const InteractionOptions(flags: InteractiveFlag.all),
                 ),
                 children: [
                   TileLayer(
@@ -593,22 +668,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.floodsos.app',
                   ),
-                  if (_currentPosition != null)
+                  if (markerPoint != null)
                     MarkerLayer(markers: [
                       Marker(
-                        point: LatLng(_currentPosition!.latitude,
-                            _currentPosition!.longitude),
+                        point: markerPoint,
                         width: 40,
                         height: 40,
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ThemeConfig.teal.withValues(alpha: 0.2),
-                            border:
-                                Border.all(color: ThemeConfig.teal, width: 2),
+                            color: (_isSimulated ? Colors.orange : ThemeConfig.teal)
+                                .withValues(alpha: 0.2),
+                            border: Border.all(
+                              color: _isSimulated ? Colors.orange : ThemeConfig.teal,
+                              width: 2,
+                            ),
                           ),
-                          child: const Icon(Icons.my_location,
-                              color: ThemeConfig.teal, size: 22),
+                          child: Icon(
+                            _isSimulated ? Icons.location_city : Icons.my_location,
+                            color:
+                                _isSimulated ? Colors.orange : ThemeConfig.teal,
+                            size: 22,
+                          ),
                         ),
                       )
                     ]),
@@ -616,6 +697,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               // Tracking Broadcaster
               const TrackingBroadcasterWidget(),
+              // Badge NGHỆ AN khi dùng vị trí giả lập
+              if (_isSimulated)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.science_outlined,
+                            size: 11, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text(
+                          'Nghệ An – Phân tích',
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               // GPS label overlay
               Positioned(
                 bottom: 0,
@@ -636,11 +746,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 13,
-                          color: _isLocationReady
-                              ? ThemeConfig.teal
-                              : Colors.orange),
+                      Icon(
+                        _isSimulated ? Icons.location_city : Icons.location_on,
+                        size: 13,
+                        color: _isSimulated
+                            ? Colors.orange
+                            : (_isLocationReady
+                                ? ThemeConfig.teal
+                                : Colors.orange),
+                      ),
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(

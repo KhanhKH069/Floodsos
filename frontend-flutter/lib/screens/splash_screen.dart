@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Glowing logo
+              // Splash App Logos (FloodSOS & PTIT)
               AnimatedBuilder(
                 animation: _pulseController,
                 builder: (context, child) => Transform.scale(
@@ -73,11 +73,11 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 child: Container(
-                  width: 120,
-                  height: 120,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: ThemeConfig.tealGradient,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                         color: ThemeConfig.teal.withValues(alpha: 0.45),
@@ -86,30 +86,23 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.water_drop,
-                    size: 58,
-                    color: Colors.white,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/logoptit.png',
+                        width: 80,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 20),
+                      Image.asset(
+                        'assets/images/logoo.png',
+                        width: 160,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                'FloodSOS',
-                style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Emergency Response System',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: ThemeConfig.tealLight,
-                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 60),

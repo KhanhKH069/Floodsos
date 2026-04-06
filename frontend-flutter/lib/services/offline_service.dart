@@ -43,6 +43,25 @@ class OfflineService {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
+  // Lấy danh sách SOS lưu nội bộ (để Admin Map vẫn thấy khi offline)
+  Future<List<Map<String, dynamic>>> getPendingSOSList() async {
+    final db = await database;
+    final maps = await db.query('pending_sos');
+    return maps.map((map) {
+      return {
+        'id': map['id'],
+        'name': 'Khẩn cấp (Offline)',
+        'phone': 'N/A',
+        'lat': map['lat'],
+        'lon': map['lng'],
+        'waterLevel': map['waterLevel'],
+        'peopleCount': map['peopleCount'],
+        'createdAt': DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int).toIso8601String(),
+        'status': 'pending',
+      };
+    }).toList();
+  }
+
   // Đồng bộ khi có mạng
   Future<void> syncPendingSOS() async {
     final db = await database;

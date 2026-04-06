@@ -13,8 +13,13 @@ const SOSAlertSchema = new mongoose.Schema({
     audio: String,
     created_at: { type: Date, default: Date.now },
     assigned_drone: { type: String, default: null },
-    // Id dùng để đồng bộ tới sos_signals.csv (để resolve/xóa khớp và tránh phá logic id của citizen).
-    csv_id: { type: String, default: null }
+    // Id dùng để đồng bộ tới sos_signals.csv
+    csv_id: { type: String, default: null },
+    // ── Community Rescue P2P ──────────────────────────────────────────────────
+    // true nếu người dùng không thể tự sơ tán và cần hàng xóm hỗ trợ
+    needs_help: { type: Boolean, default: false },
+    // 'can_walk' | 'needs_carry' | 'bedridden'
+    mobility_status: { type: String, default: 'can_walk' },
 });
 
 module.exports = mongoose.model('SOSAlert', SOSAlertSchema);

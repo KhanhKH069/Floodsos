@@ -62,6 +62,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 # 🟢 FIX LỖI "Missing implementation RecordLinux":
 # Ép buộc dùng phiên bản record_linux mới nhất để tránh lỗi build trên Windows
@@ -72,4 +74,22 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/data/
     - .env
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logoo.png"
+  min_sdk_android: 21
+  windows:
+    generate: true
+    image_path: "assets/images/logoo.png"
+    icon_size: 48
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/images/logoo.png"
+  android: true
+  ios: true
+  windows: true

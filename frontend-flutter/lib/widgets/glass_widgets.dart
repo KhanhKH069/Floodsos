@@ -14,7 +14,34 @@ class OceanBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(gradient: ThemeConfig.oceanGradient),
-      child: child,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Wallpaper watermark
+          Center(
+            child: Opacity(
+              opacity: 0.08,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logoo.png',
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 30),
+                  Image.asset(
+                    'assets/images/logoptit.png',
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          child,
+        ],
+      ),
     );
   }
 }

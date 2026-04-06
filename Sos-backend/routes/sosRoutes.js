@@ -30,4 +30,14 @@ router.put('/:id/resolve', sosController.resolve);
 // DELETE /api/sos/:id — Xóa SOS
 router.delete('/:id', sosController.remove);
 
+// ── Community Rescue (P2P) ───────────────────────────────────────────────────
+// POST /api/sos/:id/volunteer/accept  — Volunteer nhận nhiệm vụ
+router.post('/:id/volunteer/accept', sosController.volunteerAccept);
+
+// POST /api/sos/:id/volunteer/arrive  — Volunteer đã đến nơi nạn nhân
+router.post('/:id/volunteer/arrive', sosController.volunteerArrive);
+
+// POST /api/sos/:id/volunteer/complete — Volunteer đã đưa đến nơi an toàn
+router.post('/:id/volunteer/complete', sosController.volunteerComplete);
+
 module.exports = router;

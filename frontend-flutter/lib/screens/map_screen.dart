@@ -1,13 +1,17 @@
 // lib/screens/map_screen.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/sos_alert_model.dart';
+import '../models/flood_zone_model.dart';
 import '../services/api_service.dart';
+import '../services/socket_service.dart';
 import '../config/theme_config.dart';
 import '../widgets/glass_widgets.dart';
 import '../utils/cached_tile_provider.dart';
+import 'nearby_rescue_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -15,19 +19,40 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
   final ApiService _apiService = ApiService();
   final LatLng _defaultCenter = const LatLng(19.3400, 105.7100);
 
   List<SOSAlertModel> _alerts = [];
+  List<FloodZoneModel> _floodZones = [];
   bool _isLoading = true;
+  bool _isLoadingFlood = false;
   bool _showRadar = false;
+  bool _showFloodMode = false;
+
+  // Nearby SOS community rescue
+  NearbySosData? _nearbySosAlert;
+  StreamSubscription<NearbySosData>? _nearbySosSub;
 
   @override
   void initState() {
     super.initState();
     _loadAlerts();
+    _listenNearbySOS();
+  }
+
+  @override
+  void dispose() {
+    _nearbySosSub?.cancel();
+    super.dispose();
+  }
+
+  void _listenNearbySOS() {
+    _nearbySosSub = SocketService.instance.nearbySosStream.listen((sos) {
+      if (!mounted) return;
+      setState(() => _nearbySosAlert = sos);
+    });
   }
 
   Future<void> _loadAlerts() async {
@@ -43,6 +68,27 @@ class _MapScreenState extends State<MapScreen> {
     } catch (e) {
       debugPrint("Lỗi tải bản đồ: $e");
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadFloodZones() async {
+    if (_floodZones.isNotEmpty) return; // Cache
+    setState(() => _isLoadingFlood = true);
+    try {
+      final zones = await _apiService.getFloodZones();
+      setState(() {
+        _floodZones = zones;
+        _isLoadingFlood = false;
+      });
+      // Zoom về trung tâm vùng ngập sau khi tải xong
+      if (zones.isNotEmpty) {
+        final avgLat = zones.map((z) => z.lat).reduce((a, b) => a + b) / zones.length;
+        final avgLon = zones.map((z) => z.lon).reduce((a, b) => a + b) / zones.length;
+        _mapController.move(LatLng(avgLat, avgLon), 13.0);
+      }
+    } catch (e) {
+      debugPrint("Lỗi tải bản đồ ngập: $e");
+      setState(() => _isLoadingFlood = false);
     }
   }
 
@@ -78,6 +124,13 @@ class _MapScreenState extends State<MapScreen> {
     return const Color(0xFF26A69A);
   }
 
+  Color _getFloodColor(FloodZoneModel zone) {
+    if (zone.pFlood >= 0.7) return const Color(0xFFB71C1C); // đỏ đậm
+    if (zone.pFlood >= 0.4) return const Color(0xFFE64A19); // cam đỏ
+    if (zone.pFlood >= 0.2) return const Color(0xFFF9A825); // vàng
+    return const Color(0xFF1B5E20); // xanh lá
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,29 +144,76 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 const Icon(Icons.map_outlined, color: ThemeConfig.teal, size: 22),
                 const SizedBox(width: 10),
-                const Text(
-                  'Bản đồ Cứu hộ',
-                  style: TextStyle(
+                Text(
+                  _showFloodMode ? 'Bản đồ Ngập lụt' : 'Bản đồ Cứu hộ',
+                  style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
                 const Spacer(),
+                // Toggle mode pill
                 GlassPill(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
-                  onTap: () {
-                    setState(() => _isLoading = true);
-                    _loadAlerts();
-                  },
-                  child: Row(children: [
-                    const Icon(Icons.refresh, size: 14, color: ThemeConfig.tealLight),
-                    const SizedBox(width: 4),
-                    Text('${_alerts.length} SOS',
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _modeTab(Icons.sos, 'SOS', !_showFloodMode, () {
+                        setState(() => _showFloodMode = false);
+                      }),
+                      _modeTab(Icons.water, 'Ngập', _showFloodMode, () {
+                        setState(() => _showFloodMode = true);
+                        _loadFloodZones();
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Second header row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Row(
+              children: [
+                if (!_showFloodMode) ...[
+                  GlassPill(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    onTap: () {
+                      setState(() => _isLoading = true);
+                      _loadAlerts();
+                    },
+                    child: Row(children: [
+                      const Icon(Icons.refresh, size: 14, color: ThemeConfig.tealLight),
+                      const SizedBox(width: 4),
+                      Text('${_alerts.length} SOS',
+                          style: const TextStyle(
+                              color: ThemeConfig.tealLight, fontSize: 12)),
+                    ]),
+                  ),
+                ] else ...[
+                  GlassPill(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    onTap: () {
+                      setState(() {
+                        _floodZones = [];
+                        _isLoadingFlood = true;
+                      });
+                      _loadFloodZones();
+                    },
+                    child: Row(children: [
+                      const Icon(Icons.refresh, size: 14, color: ThemeConfig.tealLight),
+                      const SizedBox(width: 4),
+                      Text(
+                        _isLoadingFlood
+                            ? 'Đang tải...'
+                            : '${_floodZones.length} điểm',
                         style: const TextStyle(
                             color: ThemeConfig.tealLight, fontSize: 12)),
-                  ]),
-                ),
+                    ]),
+                  ),
+                ],
               ],
             ),
           ),
@@ -126,7 +226,6 @@ class _MapScreenState extends State<MapScreen> {
                         CircularProgressIndicator(color: ThemeConfig.teal))
                 : Stack(
                     children: [
-                      // Map
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(24)),
@@ -134,7 +233,7 @@ class _MapScreenState extends State<MapScreen> {
                           mapController: _mapController,
                           options: MapOptions(
                             initialCenter: _defaultCenter,
-                            initialZoom: 13.0,
+                            initialZoom: 10.0,
                             interactionOptions: const InteractionOptions(
                                 flags: InteractiveFlag.all),
                           ),
@@ -154,13 +253,55 @@ class _MapScreenState extends State<MapScreen> {
                                   userAgentPackageName: 'com.floodsos.app',
                                 ),
                               ),
-                            MarkerLayer(markers: _buildMarkers()),
+                            // Flood zone – vùng ngập lớn từ AI (useRadiusInMeter=true)
+                            if (_showFloodMode && _floodZones.isNotEmpty)
+                              CircleLayer(
+                                circles: _floodZones.map((zone) {
+                                  final color = _getFloodColor(zone);
+                                  // Bán kính thay đổi theo mức độ ngập
+                                  final radius = zone.pFlood >= 0.7
+                                      ? 1200.0
+                                      : zone.pFlood >= 0.4
+                                          ? 900.0
+                                          : zone.pFlood >= 0.2
+                                              ? 700.0
+                                              : 500.0;
+                                  return CircleMarker(
+                                    point: LatLng(zone.lat, zone.lon),
+                                    radius: radius,
+                                    color: color.withValues(alpha: 0.45),
+                                    borderColor: color.withValues(alpha: 0.0),
+                                    borderStrokeWidth: 0,
+                                    useRadiusInMeter: true,
+                                  );
+                                }).toList(),
+                              ),
+                            // SOS Markers
+                            if (!_showFloodMode)
+                              MarkerLayer(markers: _buildMarkers()),
                           ],
                         ),
                       ),
 
-                      // Empty state
-                      if (_alerts.isEmpty)
+                      // Loading flood overlay
+                      if (_showFloodMode && _isLoadingFlood)
+                        Container(
+                          color: Colors.black45,
+                          child: const Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(color: ThemeConfig.teal),
+                                SizedBox(height: 12),
+                                Text('Đang tải bản đồ ngập...',
+                                    style: TextStyle(color: Colors.white70)),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                      // SOS Empty state
+                      if (!_showFloodMode && _alerts.isEmpty)
                         const Positioned(
                           top: 16,
                           left: 16,
@@ -183,6 +324,44 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                         ),
 
+                      // Flood offline notice
+                      if (_showFloodMode && !_isLoadingFlood && _floodZones.isEmpty)
+                        const Positioned(
+                          top: 16,
+                          left: 16,
+                          right: 16,
+                          child: GlassCard(
+                            borderRadius: 14,
+                            padding: EdgeInsets.all(14),
+                            child: Row(children: [
+                              Icon(Icons.cloud_off, color: Colors.orangeAccent),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Dịch vụ AI ngập lụt chưa khởi động.\nHãy chạy priority_api.py để kích hoạt.',
+                                  style: TextStyle(
+                                      color: Colors.white70, fontSize: 12),
+                                ),
+                              ),
+                            ]),
+                          ),
+                        ),
+
+                      // ── Nearby SOS community rescue banner ─────────────
+                      if (_nearbySosAlert != null)
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          right: 16,
+                          child: _NearbySosBanner(
+                            sos: _nearbySosAlert!,
+                            myName: 'Người dùng',
+                            myPhone: '',
+                            onDismiss: () =>
+                                setState(() => _nearbySosAlert = null),
+                          ),
+                        ),
+
                       // Legend
                       Positioned(
                         left: 12,
@@ -193,18 +372,31 @@ class _MapScreenState extends State<MapScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('Chú giải',
-                                  style: TextStyle(
-                                      color: ThemeConfig.tealLight,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12)),
-                              const SizedBox(height: 6),
-                              _legendItem(ThemeConfig.sosRed, 'Nguy cấp'),
-                              _legendItem(ThemeConfig.warnAmber, 'Cảnh báo'),
-                              _legendItem(
-                                  const Color(0xFF26A69A), 'An toàn'),
-                            ],
+                            children: _showFloodMode
+                                ? [
+                                    const Text('Mức ngập',
+                                        style: TextStyle(
+                                            color: ThemeConfig.tealLight,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12)),
+                                    const SizedBox(height: 6),
+                                    _legendItem(const Color(0xFFB71C1C), 'Nguy cấp (≥70%)'),
+                                    _legendItem(const Color(0xFFE64A19), 'Cao (40-70%)'),
+                                    _legendItem(const Color(0xFFF9A825), 'Trung bình (20%)'),
+                                    _legendItem(const Color(0xFF1B5E20), 'Thấp (<20%)'),
+                                  ]
+                                : [
+                                    const Text('Chú giải',
+                                        style: TextStyle(
+                                            color: ThemeConfig.tealLight,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12)),
+                                    const SizedBox(height: 6),
+                                    _legendItem(ThemeConfig.sosRed, 'Nguy cấp'),
+                                    _legendItem(ThemeConfig.warnAmber, 'Cảnh báo'),
+                                    _legendItem(
+                                        const Color(0xFF26A69A), 'An toàn'),
+                                  ],
                           ),
                         ),
                       ),
@@ -216,20 +408,20 @@ class _MapScreenState extends State<MapScreen> {
                         child: Column(
                           children: [
                             _mapFab(Icons.center_focus_strong, () {
-                              if (_alerts.isNotEmpty) {
+                              if (_alerts.isNotEmpty && !_showFloodMode) {
                                 _fitBoundsToAlerts();
                               } else {
-                                _mapController.move(_defaultCenter, 13.0);
+                                _mapController.move(_defaultCenter, 10.0);
                               }
                             }),
                             const SizedBox(height: 8),
                             _mapFab(_showRadar ? Icons.cloud_off : Icons.cloudy_snowing, () {
-                              setState(() {
-                                _showRadar = !_showRadar;
-                              });
+                              setState(() => _showRadar = !_showRadar);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(_showRadar ? 'Đã bật phân tích lớp mây & mưa' : 'Đã tắt radar mưa'),
+                                  content: Text(_showRadar
+                                      ? 'Đã bật lớp mây & mưa'
+                                      : 'Đã tắt radar mưa'),
                                   duration: const Duration(seconds: 2),
                                   behavior: SnackBarBehavior.floating,
                                   backgroundColor: ThemeConfig.teal,
@@ -255,6 +447,37 @@ class _MapScreenState extends State<MapScreen> {
                   ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _modeTab(IconData icon, String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: active
+              ? ThemeConfig.teal.withValues(alpha: 0.3)
+              : Colors.transparent,
+          border: active
+              ? Border.all(color: ThemeConfig.teal, width: 1)
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: active ? ThemeConfig.teal : Colors.white54),
+            const SizedBox(width: 4),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: active ? ThemeConfig.teal : Colors.white54,
+                    fontWeight: active ? FontWeight.bold : FontWeight.normal)),
+          ],
+        ),
       ),
     );
   }
@@ -343,7 +566,6 @@ class _MapScreenState extends State<MapScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -363,8 +585,7 @@ class _MapScreenState extends State<MapScreen> {
                       shape: BoxShape.circle,
                       color: _getAlertColor(alert).withValues(alpha: 0.2),
                       border: Border.all(
-                          color:
-                              _getAlertColor(alert).withValues(alpha: 0.5)),
+                          color: _getAlertColor(alert).withValues(alpha: 0.5)),
                     ),
                     child: Icon(Icons.sos,
                         color: _getAlertColor(alert), size: 26),
@@ -393,9 +614,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ],
               ),
-              const Divider(
-                  height: 24,
-                  color: ThemeConfig.glassBorder),
+              const Divider(height: 24, color: ThemeConfig.glassBorder),
               _infoRow('📍', 'Vị trí',
                   '${alert.latitude.toStringAsFixed(4)}, ${alert.longitude.toStringAsFixed(4)}'),
               _infoRow('📞', 'SĐT',
@@ -403,7 +622,6 @@ class _MapScreenState extends State<MapScreen> {
               _infoRow('👥', 'Số người', '${alert.peopleCount ?? '?'} người'),
               _infoRow('🌊', 'Mức nước', alert.waterLevel ?? 'Chưa rõ'),
               _infoRow('🕐', 'Thời gian', _formatTime(alert.createdAt)),
-
               if (alert.message != null && alert.message!.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 GlassPill(
@@ -453,8 +671,7 @@ class _MapScreenState extends State<MapScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           Navigator.pop(context);
-                          final url =
-                              Uri(scheme: 'tel', path: alert.phone);
+                          final url = Uri(scheme: 'tel', path: alert.phone);
                           if (await canLaunchUrl(url)) await launchUrl(url);
                         },
                         icon: const Icon(Icons.call, size: 16),
@@ -506,5 +723,118 @@ class _MapScreenState extends State<MapScreen> {
     if (diff.inMinutes < 60) return "${diff.inMinutes} phút trước";
     if (diff.inHours < 24) return "${diff.inHours} giờ trước";
     return "${time.day}/${time.month} lúc ${time.hour}:${time.minute.toString().padLeft(2, '0')}";
+  }
+}
+
+// ── Banner cảnh báo hàng xóm cần giúp ─────────────────────────────────────────
+class _NearbySosBanner extends StatelessWidget {
+  final NearbySosData sos;
+  final String myName;
+  final String myPhone;
+  final VoidCallback onDismiss;
+
+  const _NearbySosBanner({
+    required this.sos,
+    required this.myName,
+    required this.myPhone,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => NearbyRescueScreen(
+                sos: sos,
+                myName: myName,
+                myPhone: myPhone,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFB71C1C), Color(0xFFE53935)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE53935).withValues(alpha: 0.5),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.handshake, color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '🆘 Hàng xóm cần giúp đỡ!',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14),
+                    ),
+                    Text(
+                      '${sos.name.isEmpty ? "Người dùng" : sos.name} • ${sos.distanceM}m',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Xem',
+                      style: TextStyle(
+                          color: Color(0xFFB71C1C),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  GestureDetector(
+                    onTap: onDismiss,
+                    child: const Text(
+                      'Bỏ qua',
+                      style: TextStyle(color: Colors.white54, fontSize: 10),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

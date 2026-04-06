@@ -32,9 +32,9 @@ class WeatherModel {
     double rain = 0.0;
     if (json['rain'] != null) {
       if (json['rain']['1h'] != null) {
-        rain = (json['rain']['1h'] as num).toDouble();
+        rain = double.tryParse(json['rain']['1h']?.toString() ?? '') ?? 0.0;
       } else if (json['rain']['3h'] != null) {
-        rain = (json['rain']['3h'] as num).toDouble();
+        rain = double.tryParse(json['rain']['3h']?.toString() ?? '') ?? 0.0;
       }
     }
 
@@ -53,7 +53,7 @@ class WeatherModel {
     List<WeatherForecast> mockForecast = List.generate(24, (index) {
       return WeatherForecast(
         time: DateTime.now().add(Duration(hours: index)),
-        temperature: (json['main']['temp'] as num).toDouble() + (index % 3 - 1),
+        temperature: (double.tryParse(json['main']['temp']?.toString() ?? '') ?? 0.0) + (index % 3 - 1),
         rainfall: rain > 0 ? rain + (index % 5) : 0.0,
         condition: cond,
       );
@@ -61,11 +61,11 @@ class WeatherModel {
 
     return WeatherModel(
       location: json['name'] ?? 'Không xác định',
-      temperature: (json['main']['temp'] as num).toDouble(),
+      temperature: double.tryParse(json['main']['temp']?.toString() ?? '') ?? 0.0,
       condition: cond,
       description: json['weather'][0]['description'],
-      humidity: (json['main']['humidity'] as num).toDouble(),
-      windSpeed: (json['wind']['speed'] as num).toDouble() * 3.6,
+      humidity: double.tryParse(json['main']['humidity']?.toString() ?? '') ?? 0.0,
+      windSpeed: (double.tryParse(json['wind']['speed']?.toString() ?? '') ?? 0.0) * 3.6,
       rainfall: rain,
       iconCode: json['weather'][0]['icon'],
       forecast: mockForecast,

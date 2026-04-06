@@ -1,6 +1,8 @@
 // lib/screens/chat_screen.dart
 import 'package:flutter/material.dart';
 import '../config/theme_config.dart';
+import '../services/api_service.dart';
+import '../services/offline_chatbot_service.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,6 +15,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  @override
+  void initState() {
+    super.initState();
+    // Load offline data immediately
+    OfflineChatbotService().init();
+  }
+
   final List<Map<String, String>> _messages = [
     {
       "role": "bot",
@@ -23,88 +32,26 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool _isTyping = false;
 
-  final Map<String, String> _provinceHotlines = {
-    'bắc giang': '0204.3854.437',
-    'hà nội': '0243.3839.131',
-    'hải phòng': '0225.3842.100',
-    'quảng ninh': '0203.3835.636',
-    'hải dương': '0220.3853.847',
-    'hưng yên': '0221.3863.664',
-    'thái bình': '0227.3731.551',
-    'nam định': '0228.3649.009',
-    'ninh bình': '0229.3871.189',
-    'hà nam': '0226.3852.793',
-    'thái nguyên': '0208.3855.127',
-    'phú thọ': '0210.3846.518',
-    'bắc kạn': '0209.3870.089',
-    'cao bằng': '0206.3852.282',
-    'lạng sơn': '0205.3812.228',
-    'tuyên quang': '0207.3822.427',
-    'yên bái': '0216.3852.316',
-    'lào cai': '0214.3840.063',
-    'điện biên': '0215.3825.269',
-    'lai châu': '0213.3876.515',
-    'sơn la': '0212.3852.136',
-    'hòa bình': '0218.3852.327',
-    'thanh hóa': '0237.3852.348',
-    'nghệ an': '0238.3844.729',
-    'hà tĩnh': '0239.3855.457',
-    'quảng bình': '0232.3822.372',
-    'quảng trị': '0233.3852.483',
-    'thừa thiên huế': '0234.3822.693',
-    'đà nẵng': '0236.3822.259',
-    'quảng nam': '0235.3810.150',
-    'quảng ngãi': '0255.3822.569',
-    'bình định': '0256.3822.346',
-    'phú yên': '0257.3823.364',
-    'khánh hòa': '0258.3822.559',
-  };
-
-  final Map<List<String>, String> _generalKnowledge = {
-    ['113', 'công an', 'cướp', 'đánh nhau']: "👮 CÔNG AN: Gọi 113",
-    ['114', 'cháy', 'cứu hỏa', 'mắc kẹt', 'đuối nước']:
-        "🚒 CỨU HỎA & CỨU NẠN: Gọi 114",
-    ['115', 'cấp cứu', 'thương', 'máu', 'bệnh viện']: "🚑 CẤP CỨU: Gọi 115",
-    ['sos', 'khẩn cấp', 'cứu']:
-        "🚨 Bấm nút ĐỎ to ngoài màn hình chính để gửi vị trí ngay!",
-    ['drone', 'máy bay']:
-        "🚁 Đội bay Drone sẽ tự động xuất kích khi nhận tín hiệu SOS.",
-  };
-
   Future<void> _handleReply(String userText) async {
-    String reply =
-        "Xin lỗi, tôi chưa tìm thấy thông tin cho tỉnh này. Hãy thử nhập tên tỉnh chính xác (vd: Bắc Giang).";
-    String input = userText.toLowerCase().trim();
-    bool found = false;
-
-    for (var entry in _provinceHotlines.entries) {
-      if (input.contains(entry.key)) {
-        String provinceName = entry.key
-            .split(" ")
-            .map((s) => s[0].toUpperCase() + s.substring(1))
-            .join(" ");
-        reply =
-            "📞 Ban Chỉ Huy PCTT Tỉnh $provinceName\n\n☎️ Hotline: ${entry.value}\n\n(Trực ban 24/7)";
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      for (var entry in _generalKnowledge.entries) {
-        for (var keyword in entry.key) {
-          if (input.contains(keyword)) {
-            reply = entry.value;
-            found = true;
-            break;
-          }
-        }
-        if (found) break;
-      }
-    }
-
     setState(() => _isTyping = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    
+    // Quick delay to update typing UI
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    String reply = "";
+
+    try {
+      // 1. Try Online API First
+      reply = await ApiService().sendChatMessage(userText);
+      
+      // If ApiService returns its hardcoded error strings, fallback
+      if (reply.contains("Không thể kết nối") || reply.contains("Lỗi phản hồi")) {
+        reply = await OfflineChatbotService().processMessage(userText);
+      }
+    } catch (e) {
+      // 2. Offine Fallback on actual Exception
+      reply = await OfflineChatbotService().processMessage(userText);
+    }
 
     if (mounted) {
       setState(() {
@@ -158,14 +105,20 @@ class _ChatScreenState extends State<ChatScreen> {
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Trợ lý PCTT",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
+                    Row(
+                      children: [
+                        Text(
+                          "Trợ lý AI PCTT",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16),
+                        ),
+                        SizedBox(width: 6),
+                        Icon(Icons.wifi_protected_setup, color: Colors.greenAccent, size: 14),
+                      ],
                     ),
-                    Text("Tra cứu hotline 24/7",
+                    Text("Trực tuyến & Ngoại tuyến",
                         style: TextStyle(
                             color: ThemeConfig.tealLight, fontSize: 12)),
                   ],
@@ -267,7 +220,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       controller: _controller,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: "Nhập tên tỉnh (vd: Nghệ An)...",
+                        hintText: "Nhập câu hỏi hoặc tên tỉnh...",
                         hintStyle: TextStyle(color: Colors.white38),
                         border: InputBorder.none,
                         contentPadding:

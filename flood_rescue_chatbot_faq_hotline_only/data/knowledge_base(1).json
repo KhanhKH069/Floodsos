@@ -1,0 +1,1204 @@
+[
+  {
+    "id": "faq-001",
+    "category": "safety",
+    "question_variations": [
+      "mất điện khi nhà đang ngập phải làm sao",
+      "điện bị ngắt trong lúc ngập thì xử lý thế nào",
+      "nước ngập mà còn điện thì có nguy hiểm không"
+    ],
+    "answer": "Nếu nhà đang ngập và nghi có điện, tuyệt đối không chạm vào ổ điện, thiết bị điện hoặc dây điện bị ướt. Nếu có thể ngắt điện từ cầu dao ở vị trí khô ráo và an toàn thì mới thực hiện. Nếu không chắc an toàn, hãy tránh xa khu vực có điện và gọi lực lượng hỗ trợ.",
+    "severity": "green",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-002",
+    "category": "evacuation",
+    "question_variations": [
+      "cần chuẩn bị gì trước khi sơ tán",
+      "đồ thiết yếu khi di tản do ngập",
+      "nên mang theo gì khi đi tránh trú"
+    ],
+    "answer": "Khi chuẩn bị sơ tán, anh/chị nên mang theo giấy tờ tùy thân, điện thoại và sạc, đèn pin, thuốc cá nhân, nước uống, thức ăn khô, quần áo gọn nhẹ, áo phao nếu có và đồ dùng cho trẻ nhỏ hoặc người bệnh.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-003",
+    "category": "shelter",
+    "question_variations": [
+      "gần tôi có điểm trú ẩn nào",
+      "nơi tránh trú khi ngập",
+      "đi đâu để tránh trú an toàn"
+    ],
+    "answer": "Anh/chị hãy gửi quận/huyện, phường/xã hoặc địa chỉ cụ thể để tôi tra cứu điểm tránh trú gần nhất từ dữ liệu hệ thống.",
+    "severity": "green",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-004",
+    "category": "water",
+    "question_variations": [
+      "nước lũ có dùng để nấu ăn được không",
+      "có nên dùng nước ngập để sinh hoạt",
+      "nước sau ngập có an toàn không"
+    ],
+    "answer": "Không nên dùng nước ngập hoặc nước lũ để uống, nấu ăn hay rửa thực phẩm. Anh/chị nên dùng nước đóng chai, nước đã đun sôi kỹ hoặc nguồn nước sạch đã được cơ quan chức năng xác nhận an toàn.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-005",
+    "category": "health",
+    "question_variations": [
+      "khi bị ngâm nước bẩn lâu cần làm gì",
+      "da bị ngứa sau ngập phải làm sao",
+      "ngập lụt có dễ bị nhiễm khuẩn không"
+    ],
+    "answer": "Sau khi tiếp xúc nước ngập bẩn, cần rửa sạch da bằng nước sạch và xà phòng, thay quần áo khô càng sớm càng tốt. Nếu có vết thương hở, sốt, đỏ da hoặc đau tăng, nên tới cơ sở y tế.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-006",
+    "category": "emergency",
+    "question_variations": [
+      "khi nào cần gọi cứu hộ khẩn cấp",
+      "trường hợp nào phải yêu cầu cứu hộ ngay",
+      "dấu hiệu nguy hiểm cần cứu hộ"
+    ],
+    "answer": "Cần yêu cầu cứu hộ khẩn cấp khi có người mắc kẹt, nước dâng nhanh, có trẻ em/người già/người bệnh trong vùng ngập, có nguy cơ điện giật, sạt lở, nước chảy xiết hoặc không thể tự sơ tán an toàn.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-007",
+    "category": "tracking",
+    "question_variations": [
+      "làm sao để tra cứu mã cứu hộ",
+      "kiểm tra tình trạng yêu cầu cứu hộ",
+      "theo dõi phiếu cứu hộ như thế nào"
+    ],
+    "answer": "Anh/chị chỉ cần gửi lại mã phiếu theo dạng FH-YYYYMMDD-0001, tôi sẽ kiểm tra trạng thái hiện tại của yêu cầu.",
+    "severity": "green",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-008",
+    "category": "first_aid",
+    "question_variations": [
+      "người bị lạnh run do ngập nước cần làm gì",
+      "sơ cứu khi ngâm nước lâu",
+      "giữ ấm cho người bị ngập như thế nào"
+    ],
+    "answer": "Hãy đưa người bị lạnh run ra khỏi vùng nước, lau khô người, thay đồ khô, giữ ấm bằng chăn hoặc áo khoác. Nếu người đó mệt lả, khó thở, lơ mơ hoặc tím tái thì cần gọi hỗ trợ y tế khẩn cấp.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-009",
+    "category": "food",
+    "question_variations": [
+      "thực phẩm sau ngập có dùng được không",
+      "đồ ăn bị ngâm nước có nên giữ lại",
+      "tủ lạnh mất điện khi ngập thì thực phẩm xử lý sao"
+    ],
+    "answer": "Không nên dùng thực phẩm đã bị nước ngập chạm vào. Với thực phẩm bảo quản lạnh, nếu mất điện kéo dài và thực phẩm có dấu hiệu hỏng hoặc không còn lạnh an toàn thì nên bỏ đi để tránh ngộ độc.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "faq-010",
+    "category": "communication",
+    "question_variations": [
+      "mất sóng điện thoại khi ngập thì làm sao",
+      "điện thoại sắp hết pin trong lúc chờ cứu hộ",
+      "giữ liên lạc khi mất điện như thế nào"
+    ],
+    "answer": "Ưu tiên giữ pin điện thoại bằng cách giảm độ sáng, tắt ứng dụng không cần thiết, bật chế độ tiết kiệm pin. Khi có thể, chỉ liên lạc những thông tin quan trọng như vị trí, số người và tình trạng nguy hiểm.",
+    "severity": "yellow",
+    "immediate_actions": [],
+    "dont_do": [],
+    "escalate_if": []
+  },
+  {
+    "id": "playbook-011",
+    "category": "first_aid",
+    "severity": "orange",
+    "question_variations": [
+      "bị lạnh run sau khi ngâm nước cần làm gì",
+      "run cầm cập sau khi lội nước lâu phải làm sao",
+      "ngâm nước lạnh lâu rồi rét run xử lý thế nào"
+    ],
+    "immediate_actions": [
+      "Đưa người đó ra khỏi vùng nước và vào nơi khô, kín gió",
+      "Cởi bỏ quần áo ướt, lau khô người và thay đồ khô",
+      "Ủ ấm từ từ bằng chăn, áo khoác hoặc khăn khô"
+    ],
+    "dont_do": [
+      "Không làm ấm đột ngột bằng nước quá nóng hoặc lửa",
+      "Không cho tiếp xúc thêm với gió lạnh hoặc nước lạnh"
+    ],
+    "escalate_if": [
+      "lơ mơ",
+      "khó thở",
+      "mệt lả",
+      "tím tái"
+    ],
+    "answer": "Nếu người bị lạnh run sau khi ngâm nước, hãy đưa ra nơi khô ráo, cởi đồ ướt, lau khô và ủ ấm từ từ. Nếu người đó lơ mơ, khó thở, tím tái hoặc mệt lả, cần gọi cứu hộ hoặc y tế khẩn cấp."
+  },
+  {
+    "id": "playbook-012",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "người bị ngâm nước lạnh xong lơ mơ phải làm gì",
+      "sau khi ngâm nước người đó buồn ngủ khó đánh thức",
+      "lạnh run rồi nói chậm lơ mơ xử lý sao"
+    ],
+    "immediate_actions": [
+      "Giữ người đó ở nơi khô, ấm và theo dõi nhịp thở liên tục",
+      "Cởi đồ ướt và làm ấm từ từ vùng thân mình",
+      "Gọi y tế hoặc cứu hộ ngay"
+    ],
+    "dont_do": [
+      "Không để người đó đi lại nhiều",
+      "Không làm ấm quá nhanh bằng nguồn nhiệt rất nóng"
+    ],
+    "escalate_if": [
+      "khó đánh thức",
+      "thở yếu",
+      "ngất",
+      "co giật"
+    ],
+    "answer": "Lơ mơ, buồn ngủ khó đánh thức sau khi ngâm nước lạnh là dấu hiệu nguy cấp. Hãy giữ ấm từ từ và gọi hỗ trợ y tế ngay."
+  },
+  {
+    "id": "playbook-013",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "bất tỉnh nhưng còn thở sau khi ngâm nước lạnh",
+      "người ngấm lạnh xong ngất nhưng vẫn thở",
+      "nạn nhân hạ thân nhiệt bất tỉnh xử lý sao"
+    ],
+    "immediate_actions": [
+      "Kiểm tra người đó còn thở hay không",
+      "Nếu còn thở và không nghi chấn thương nặng, đặt nằm nghiêng an toàn",
+      "Cởi đồ ướt, giữ ấm từ từ và gọi cấp cứu ngay"
+    ],
+    "dont_do": [
+      "Không để nằm trực tiếp trên nền ướt hoặc lạnh",
+      "Không rời người đó một mình"
+    ],
+    "escalate_if": [
+      "thở chậm dần",
+      "ngừng thở",
+      "da tím tái"
+    ],
+    "answer": "Nếu người đó bất tỉnh nhưng còn thở sau khi ngâm nước lạnh, hãy giữ đường thở thông, đặt nằm nghiêng an toàn nếu phù hợp, giữ ấm từ từ và gọi cấp cứu ngay."
+  },
+  {
+    "id": "playbook-014",
+    "category": "first_aid",
+    "severity": "orange",
+    "question_variations": [
+      "trẻ em bị lạnh run sau ngập nước cần làm gì",
+      "bé ngâm nước lâu rồi môi tím lạnh xử lý sao",
+      "trẻ nhỏ ngâm nước xong rét run phải làm sao"
+    ],
+    "immediate_actions": [
+      "Thay ngay quần áo ướt của trẻ bằng đồ khô",
+      "Lau khô và quấn ấm vùng ngực, bụng, đầu",
+      "Cho trẻ ở nơi kín gió và theo dõi thở"
+    ],
+    "dont_do": [
+      "Không dùng nước rất nóng để làm ấm trẻ",
+      "Không để trẻ tiếp tục ngồi trên nền lạnh, ướt"
+    ],
+    "escalate_if": [
+      "trẻ li bì",
+      "môi tím",
+      "khó thở",
+      "run không dứt"
+    ],
+    "answer": "Với trẻ em bị lạnh run sau khi ngâm nước, cần thay đồ ướt ngay, lau khô, giữ ấm vùng thân mình và theo dõi sát. Nếu trẻ li bì, tím tái hoặc khó thở, phải gọi hỗ trợ y tế ngay."
+  },
+  {
+    "id": "playbook-015",
+    "category": "first_aid",
+    "severity": "yellow",
+    "question_variations": [
+      "sau khi được cứu khỏi nước có nên cho uống nước nóng không",
+      "bị lạnh run có nên uống nước ấm không",
+      "giữ ấm người ngâm nước bằng đồ uống thế nào"
+    ],
+    "immediate_actions": [
+      "Có thể cho uống đồ ấm nếu người đó hoàn toàn tỉnh táo và nuốt được",
+      "Ưu tiên giữ ấm bằng quần áo khô, chăn và nơi kín gió"
+    ],
+    "dont_do": [
+      "Không cho uống rượu hoặc chất kích thích",
+      "Không ép uống nếu người đó lơ mơ hoặc buồn nôn"
+    ],
+    "escalate_if": [
+      "nôn nhiều",
+      "khó nuốt",
+      "lơ mơ"
+    ],
+    "answer": "Nếu người bị lạnh run vẫn tỉnh táo và nuốt tốt, có thể cho uống đồ ấm. Không cho uống rượu, và không ép uống nếu người đó lơ mơ hoặc buồn nôn."
+  },
+  {
+    "id": "playbook-016",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "bị điện giật khi đang lội nước phải làm gì",
+      "người chạm điện trong vùng ngập xử lý sao",
+      "điện giật trong nước ngập cần làm gì"
+    ],
+    "immediate_actions": [
+      "Không chạm trực tiếp vào nạn nhân cho tới khi chắc chắn đã ngắt điện",
+      "Ngắt aptomat hoặc cầu dao từ vị trí khô ráo nếu làm được an toàn",
+      "Sau khi cắt điện, kiểm tra thở và gọi cấp cứu"
+    ],
+    "dont_do": [
+      "Không lội vào vùng nước nghi có điện",
+      "Không dùng tay trần kéo nạn nhân khi nguồn điện chưa ngắt"
+    ],
+    "escalate_if": [
+      "bất tỉnh",
+      "khó thở",
+      "đau ngực",
+      "bỏng điện"
+    ],
+    "answer": "Điện giật trong vùng ngập là tình huống cực kỳ nguy hiểm. Chỉ tiếp cận nạn nhân sau khi đã ngắt điện an toàn; sau đó kiểm tra thở và gọi cấp cứu ngay."
+  },
+  {
+    "id": "playbook-017",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "dây điện rơi xuống nước phải làm sao",
+      "cột điện đổ trong vùng ngập xử lý thế nào",
+      "thấy dây điện nằm trong nước ngập"
+    ],
+    "immediate_actions": [
+      "Khoanh tránh xa khu vực nước đó",
+      "Cảnh báo mọi người không lại gần",
+      "Báo ngay cho điện lực hoặc lực lượng cứu hộ"
+    ],
+    "dont_do": [
+      "Không đi bộ hay lái xe qua vùng nước có dây điện rơi",
+      "Không cố tự di dời dây điện"
+    ],
+    "escalate_if": [
+      "có người mắc kẹt gần đó",
+      "nước dâng nhanh"
+    ],
+    "answer": "Nếu có dây điện rơi xuống nước, hãy coi toàn bộ vùng nước đó là có điện. Tránh xa, cảnh báo người khác và báo ngay cho điện lực hoặc cứu hộ."
+  },
+  {
+    "id": "playbook-018",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "điện giật xong bất tỉnh phải làm sao",
+      "nạn nhân điện giật không phản ứng",
+      "bị điện giật rồi ngất"
+    ],
+    "immediate_actions": [
+      "Ngắt điện an toàn ngay nếu có thể",
+      "Gọi cấp cứu ngay",
+      "Kiểm tra người đó còn thở hay không"
+    ],
+    "dont_do": [
+      "Không chạm nạn nhân nếu chưa chắc đã cắt điện",
+      "Không cho ăn uống khi nạn nhân chưa tỉnh"
+    ],
+    "escalate_if": [
+      "ngừng thở",
+      "co giật",
+      "không tỉnh lại"
+    ],
+    "answer": "Nếu nạn nhân điện giật bất tỉnh, ưu tiên cắt điện an toàn, gọi cấp cứu và kiểm tra nhịp thở ngay. Đây là tình huống nguy cấp."
+  },
+  {
+    "id": "playbook-019",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "ổ điện ướt trong nhà đang ngập có nguy hiểm không",
+      "thiết bị điện bị ngập nước phải làm sao",
+      "nhà ngập mà ổ điện còn ướt"
+    ],
+    "immediate_actions": [
+      "Tránh xa toàn bộ thiết bị điện bị ướt",
+      "Ngắt điện từ vị trí an toàn nếu làm được",
+      "Chỉ sử dụng lại sau khi được kiểm tra an toàn"
+    ],
+    "dont_do": [
+      "Không cắm/rút phích cắm khi tay ướt hoặc đang đứng trong nước",
+      "Không tự bật lại thiết bị điện vừa ngập"
+    ],
+    "escalate_if": [
+      "có tia lửa",
+      "mùi khét",
+      "nghi chập điện"
+    ],
+    "answer": "Thiết bị điện và ổ điện bị ướt trong nhà ngập có thể gây điện giật. Hãy tránh xa, ngắt điện an toàn nếu có thể và không sử dụng lại cho tới khi được kiểm tra."
+  },
+  {
+    "id": "playbook-020",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "vớt lên khỏi nước nhưng không thở phải làm gì",
+      "đuối nước rồi bất tỉnh không thở",
+      "nạn nhân chìm nước được kéo lên nhưng ngừng thở"
+    ],
+    "immediate_actions": [
+      "Gọi cấp cứu ngay",
+      "Nếu anh/chị đã được huấn luyện, mở đường thở và hỗ trợ hô hấp/CPR theo hướng dẫn khẩn cấp",
+      "Giữ nạn nhân trên mặt phẳng an toàn và khô ráo"
+    ],
+    "dont_do": [
+      "Không trì hoãn gọi cấp cứu",
+      "Không cố dốc ngược người để xả nước"
+    ],
+    "escalate_if": [
+      "mọi trường hợp"
+    ],
+    "answer": "Nạn nhân đuối nước không thở là cấp cứu tối khẩn. Hãy gọi cấp cứu ngay và hỗ trợ hô hấp/CPR nếu anh/chị đã được huấn luyện."
+  },
+  {
+    "id": "playbook-021",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "đuối nước nhưng còn thở và ho sặc phải làm sao",
+      "vớt lên rồi còn thở nhưng ho nhiều",
+      "uống nhiều nước sau khi chìm nước xử lý sao"
+    ],
+    "immediate_actions": [
+      "Đặt người đó nằm nghiêng an toàn nếu tỉnh kém hoặc dễ sặc",
+      "Giữ ấm, theo dõi nhịp thở liên tục",
+      "Gọi y tế ngay vì tình trạng có thể xấu đi"
+    ],
+    "dont_do": [
+      "Không để nạn nhân ở một mình",
+      "Không cho ăn uống ngay khi đang ho sặc"
+    ],
+    "escalate_if": [
+      "khó thở",
+      "môi tím",
+      "lơ mơ",
+      "thở gấp"
+    ],
+    "answer": "Ngay cả khi nạn nhân đuối nước vẫn còn thở, vẫn cần gọi y tế ngay. Hãy giữ ấm, đặt nằm nghiêng an toàn nếu cần và theo dõi thở liên tục."
+  },
+  {
+    "id": "playbook-022",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "thấy người bị nước cuốn có nên lao xuống cứu không",
+      "cứu người bị cuốn trôi trong nước ngập thế nào",
+      "thấy người chìm nước phải làm sao trước"
+    ],
+    "immediate_actions": [
+      "Gọi cứu hộ ngay",
+      "Nếu có thể, ném phao, dây hoặc vật nổi từ vị trí an toàn",
+      "Hướng dẫn nạn nhân bám vật nổi và trôi về nơi ít dòng chảy hơn nếu nghe được"
+    ],
+    "dont_do": [
+      "Không tự nhảy xuống nước nếu không có phương tiện và kỹ năng phù hợp",
+      "Không lại gần dòng nước xiết"
+    ],
+    "escalate_if": [
+      "dòng chảy mạnh",
+      "nạn nhân mất dấu",
+      "trẻ em hoặc người già"
+    ],
+    "answer": "Khi thấy người bị nước cuốn, ưu tiên gọi cứu hộ và hỗ trợ từ vị trí an toàn bằng phao, dây hoặc vật nổi. Không tự lao xuống nếu bản thân không an toàn."
+  },
+  {
+    "id": "playbook-023",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "trẻ em sặc nước sau ngập phải làm sao",
+      "bé bị ngạt nước nhưng còn thở",
+      "trẻ vừa được kéo khỏi nước đang ho và khóc"
+    ],
+    "immediate_actions": [
+      "Giữ đường thở thông thoáng, đặt trẻ ở tư thế an toàn",
+      "Giữ ấm và theo dõi sát nhịp thở",
+      "Đưa trẻ đi cấp cứu hoặc gọi y tế ngay"
+    ],
+    "dont_do": [
+      "Không chủ quan vì trẻ vẫn khóc hoặc còn thở",
+      "Không để trẻ ngủ một mình ngay sau sự cố"
+    ],
+    "escalate_if": [
+      "khó thở",
+      "thở nhanh",
+      "li bì",
+      "tím tái"
+    ],
+    "answer": "Trẻ em sau khi sặc nước hoặc đuối nước cần được theo dõi y tế ngay cả khi còn thở. Hãy giữ ấm, giữ đường thở thông và đi cấp cứu."
+  },
+  {
+    "id": "playbook-024",
+    "category": "first_aid",
+    "severity": "orange",
+    "question_variations": [
+      "vết thương hở dính nước bẩn phải làm gì",
+      "bị trầy chân rồi lội nước ngập xử lý sao",
+      "vết cắt tiếp xúc nước lũ cần làm gì"
+    ],
+    "immediate_actions": [
+      "Rửa kỹ vết thương bằng xà phòng và nước sạch",
+      "Thấm khô và băng chống nước",
+      "Giữ vết thương tránh tiếp xúc lại với nước ngập"
+    ],
+    "dont_do": [
+      "Không để vết thương hở tiếp tục ngâm trong nước bẩn",
+      "Không dùng nước ngập để rửa vết thương"
+    ],
+    "escalate_if": [
+      "đỏ nhiều",
+      "sưng",
+      "rỉ dịch",
+      "sốt"
+    ],
+    "answer": "Nếu vết thương hở đã tiếp xúc nước bẩn, cần rửa bằng xà phòng và nước sạch càng sớm càng tốt, băng kín chống nước và theo dõi dấu hiệu nhiễm trùng."
+  },
+  {
+    "id": "playbook-025",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "chảy máu nhiều khi đang ngập phải làm sao",
+      "máu chảy ướt đẫm không cầm được",
+      "vết thương chảy máu mạnh xử lý thế nào"
+    ],
+    "immediate_actions": [
+      "Dùng gạc hoặc vải sạch ép trực tiếp mạnh lên vết thương",
+      "Gọi cấp cứu ngay",
+      "Nếu có thể, nâng cao vùng bị thương trong khi vẫn ép"
+    ],
+    "dont_do": [
+      "Không bỏ tay ra xem máu đã cầm chưa liên tục",
+      "Không để nạn nhân tiếp tục đi lại"
+    ],
+    "escalate_if": [
+      "máu thấm ướt liên tục",
+      "nạn nhân choáng",
+      "lơ mơ",
+      "thở nhanh"
+    ],
+    "answer": "Chảy máu nhiều là tình huống cấp cứu. Hãy ép trực tiếp mạnh bằng gạc hoặc vải sạch và gọi cấp cứu ngay."
+  },
+  {
+    "id": "playbook-026",
+    "category": "first_aid",
+    "severity": "orange",
+    "question_variations": [
+      "đạp phải đinh trong nước bẩn phải làm gì",
+      "bị vật nhọn đâm chân khi lội nước ngập",
+      "vết đâm do rác dưới nước xử lý sao"
+    ],
+    "immediate_actions": [
+      "Rửa vùng bị thương bằng nước sạch nếu có",
+      "Băng tạm thời bằng vật liệu sạch",
+      "Đi khám sớm để được đánh giá nguy cơ nhiễm trùng và uốn ván"
+    ],
+    "dont_do": [
+      "Không tiếp tục lội nước bẩn với vết thương hở",
+      "Không đắp lá hoặc chất bẩn lên vết thương"
+    ],
+    "escalate_if": [
+      "sưng nóng đỏ",
+      "đau tăng",
+      "sốt",
+      "chảy mủ"
+    ],
+    "answer": "Vết đâm bởi vật nhọn trong nước bẩn dễ nhiễm trùng. Hãy rửa bằng nước sạch, băng tạm và đi khám sớm."
+  },
+  {
+    "id": "playbook-027",
+    "category": "first_aid",
+    "severity": "orange",
+    "question_variations": [
+      "vết thương sau ngập bị đỏ sưng đau phải làm sao",
+      "vết cắt rỉ dịch sau khi dính nước lũ",
+      "nghi nhiễm trùng vết thương sau ngập"
+    ],
+    "immediate_actions": [
+      "Giữ vết thương sạch và khô",
+      "Thay băng bằng vật liệu sạch",
+      "Đi khám ngay để được đánh giá nhiễm trùng"
+    ],
+    "dont_do": [
+      "Không tiếp tục ngâm vết thương trong nước bẩn",
+      "Không tự bôi thuốc không rõ nguồn gốc"
+    ],
+    "escalate_if": [
+      "sốt",
+      "lơ mơ",
+      "khó thở",
+      "tim đập nhanh"
+    ],
+    "answer": "Đỏ, sưng, đau tăng hoặc rỉ dịch sau khi vết thương dính nước lũ là dấu hiệu có thể nhiễm trùng. Cần đi khám sớm."
+  },
+  {
+    "id": "playbook-028",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "người bị lơ mơ sau ngập phải làm gì",
+      "nói nhảm không tỉnh táo khi đang mắc kẹt",
+      "sau ngập người đó mơ màng khó đánh thức"
+    ],
+    "immediate_actions": [
+      "Kiểm tra người đó còn thở hay không",
+      "Nếu còn thở và không nghi chấn thương nặng, đặt nằm nghiêng an toàn",
+      "Gọi y tế hoặc cứu hộ ngay"
+    ],
+    "dont_do": [
+      "Không cho ăn uống khi đang lơ mơ",
+      "Không để người đó ở một mình"
+    ],
+    "escalate_if": [
+      "khó thở",
+      "co giật",
+      "bất tỉnh",
+      "không tỉnh lại"
+    ],
+    "answer": "Người lơ mơ hoặc không tỉnh táo trong bối cảnh ngập lụt là dấu hiệu nguy cấp. Cần kiểm tra thở, đặt tư thế an toàn nếu phù hợp và gọi hỗ trợ y tế ngay."
+  },
+  {
+    "id": "playbook-029",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "khó thở khi đang ngập cần làm gì",
+      "thở gấp, không đủ hơi trong vùng ngập",
+      "người nhà khó thở sau khi ngâm nước"
+    ],
+    "immediate_actions": [
+      "Giúp người đó ngồi hoặc nửa ngồi nếu dễ thở hơn",
+      "Nới lỏng quần áo quanh cổ và ngực",
+      "Gọi y tế hoặc cứu hộ ngay"
+    ],
+    "dont_do": [
+      "Không ép người đó nằm phẳng nếu thấy khó thở hơn",
+      "Không để tiếp xúc khói, khí gas hoặc môi trường kín"
+    ],
+    "escalate_if": [
+      "môi tím",
+      "không nói thành câu",
+      "lơ mơ",
+      "đau ngực"
+    ],
+    "answer": "Khó thở là tình huống cần hỗ trợ khẩn cấp. Hãy giúp người đó ở tư thế dễ thở hơn, nới lỏng quần áo và gọi y tế ngay."
+  },
+  {
+    "id": "playbook-030",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "đang co giật phải làm gì",
+      "người lên cơn giật trong lúc ngập",
+      "co giật xử lý thế nào cho an toàn"
+    ],
+    "immediate_actions": [
+      "Dọn vật cứng hoặc sắc nhọn xung quanh",
+      "Đỡ đầu nạn nhân bằng khăn hoặc vật mềm",
+      "Ghi thời gian bắt đầu cơn co giật"
+    ],
+    "dont_do": [
+      "Không giữ chặt tay chân nạn nhân",
+      "Không cho bất cứ thứ gì vào miệng",
+      "Không cố cho uống thuốc hoặc nước khi đang co giật"
+    ],
+    "escalate_if": [
+      "cơn kéo dài quá 5 phút",
+      "co giật liên tiếp",
+      "khó thở sau cơn",
+      "không tỉnh lại"
+    ],
+    "answer": "Khi có người đang co giật, hãy bảo vệ họ khỏi chấn thương, đỡ đầu và ghi thời gian cơn. Không giữ chặt người đó và không cho gì vào miệng."
+  },
+  {
+    "id": "playbook-031",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "co giật xong vẫn mê man phải làm sao",
+      "sau cơn giật người đó chưa tỉnh",
+      "hết co giật nhưng còn lơ mơ"
+    ],
+    "immediate_actions": [
+      "Sau khi cơn dừng, đặt nằm nghiêng an toàn nếu phù hợp",
+      "Theo dõi nhịp thở liên tục",
+      "Gọi y tế nếu chưa hồi tỉnh hoàn toàn"
+    ],
+    "dont_do": [
+      "Không cho ăn uống ngay sau cơn giật",
+      "Không để người đó ở một mình"
+    ],
+    "escalate_if": [
+      "không tỉnh lại",
+      "khó thở",
+      "co giật lại",
+      "chấn thương đầu"
+    ],
+    "answer": "Nếu người đó còn mê man sau cơn co giật, hãy đặt nằm nghiêng an toàn, theo dõi thở và gọi y tế ngay."
+  },
+  {
+    "id": "playbook-032",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "bất tỉnh nhưng còn thở phải làm gì",
+      "người ngất nhưng vẫn thở xử lý thế nào",
+      "mất ý thức nhưng còn thở trong vùng ngập"
+    ],
+    "immediate_actions": [
+      "Giữ đường thở thông thoáng",
+      "Đặt nằm nghiêng an toàn nếu không nghi chấn thương nặng",
+      "Gọi y tế ngay"
+    ],
+    "dont_do": [
+      "Không cho ăn uống",
+      "Không lắc mạnh người bất tỉnh"
+    ],
+    "escalate_if": [
+      "thở yếu",
+      "nôn",
+      "không tỉnh lại",
+      "co giật"
+    ],
+    "answer": "Nếu người đó bất tỉnh nhưng còn thở, hãy giữ đường thở thông, đặt nằm nghiêng an toàn nếu phù hợp và gọi y tế ngay."
+  },
+  {
+    "id": "playbook-033",
+    "category": "rescue_priority",
+    "severity": "red",
+    "question_variations": [
+      "có người già bị kẹt trong nhà ngập",
+      "ông bà không đi lại được đang mắc kẹt",
+      "người lớn tuổi mắc kẹt tầng 1 vì nước lên"
+    ],
+    "immediate_actions": [
+      "Gửi ngay vị trí hiện tại hoặc địa chỉ càng chi tiết càng tốt",
+      "Cho biết số người mắc kẹt và khả năng di chuyển",
+      "Nếu an toàn, đưa người già lên vị trí cao và khô hơn"
+    ],
+    "dont_do": [
+      "Không để người lớn tuổi một mình ở tầng thấp khi nước tiếp tục dâng",
+      "Không để tiếp xúc ổ điện, nước chảy xiết"
+    ],
+    "escalate_if": [
+      "có bệnh nền nặng",
+      "khó thở",
+      "nước lên nhanh",
+      "mất điện"
+    ],
+    "answer": "Người già mắc kẹt trong vùng ngập là trường hợp ưu tiên cao. Hãy gửi ngay vị trí, số người, khả năng di chuyển và tình trạng sức khỏe để tạo phiếu cứu hộ khẩn cấp."
+  },
+  {
+    "id": "playbook-034",
+    "category": "rescue_priority",
+    "severity": "red",
+    "question_variations": [
+      "trẻ em bị kẹt trong nhà ngập phải làm sao",
+      "bé nhỏ mắc kẹt khi nước đang dâng",
+      "có trẻ em trong vùng ngập sâu cần hỗ trợ"
+    ],
+    "immediate_actions": [
+      "Gửi ngay vị trí hoặc chia sẻ định vị nếu có",
+      "Cho biết số trẻ em, tuổi và có người lớn đi cùng hay không",
+      "Đưa trẻ lên nơi cao, khô, ấm và xa ổ điện nếu làm được an toàn"
+    ],
+    "dont_do": [
+      "Không để trẻ tự di chuyển trong nước ngập",
+      "Không để trẻ ở gần cửa, ban công hoặc dòng nước mạnh"
+    ],
+    "escalate_if": [
+      "trẻ sơ sinh",
+      "nước lên nhanh",
+      "mất điện",
+      "không còn liên lạc ổn định"
+    ],
+    "answer": "Trẻ em mắc kẹt trong vùng ngập là ưu tiên rất cao. Hãy gửi vị trí ngay để được điều phối cứu hộ."
+  },
+  {
+    "id": "playbook-035",
+    "category": "rescue_priority",
+    "severity": "red",
+    "question_variations": [
+      "người nằm một chỗ cần sơ tán khi ngập",
+      "bệnh nhân liệt không di chuyển được trong vùng ngập",
+      "có người bệnh nặng cần bế cáng đi"
+    ],
+    "immediate_actions": [
+      "Gửi vị trí, số tầng, số người hỗ trợ tại chỗ",
+      "Cho biết người bệnh có dùng oxy, thuốc tim, insulin hay thiết bị hỗ trợ nào không",
+      "Chuẩn bị sẵn giấy tờ và thuốc thiết yếu nếu phải sơ tán"
+    ],
+    "dont_do": [
+      "Không tự di chuyển người bệnh nặng qua nước sâu nếu không có phương tiện an toàn",
+      "Không bỏ quên thuốc hoặc thiết bị y tế thiết yếu"
+    ],
+    "escalate_if": [
+      "khó thở",
+      "mất oxy",
+      "mất điện cho thiết bị y tế",
+      "nước vào phòng"
+    ],
+    "answer": "Người nằm một chỗ hoặc bệnh nặng trong vùng ngập cần hỗ trợ sơ tán chuyên biệt. Hãy gửi ngay vị trí và tình trạng y tế để điều phối lực lượng phù hợp."
+  },
+  {
+    "id": "playbook-036",
+    "category": "rescue_priority",
+    "severity": "orange",
+    "question_variations": [
+      "người già bị bỏ thuốc trong lúc ngập phải làm sao",
+      "đang mắc kẹt mà hết thuốc huyết áp/tiểu đường",
+      "trong nhà ngập có người bệnh cần thuốc"
+    ],
+    "immediate_actions": [
+      "Cho biết tên thuốc cần dùng và thời điểm liều cuối",
+      "Giữ người bệnh ở nơi khô, an toàn",
+      "Liên hệ hỗ trợ y tế hoặc điều phối viên để ưu tiên tiếp cận"
+    ],
+    "dont_do": [
+      "Không tự ý dùng nhầm thuốc của người khác",
+      "Không để người bệnh gắng sức trong nước ngập"
+    ],
+    "escalate_if": [
+      "khó thở",
+      "tụt đường huyết nghi ngờ",
+      "đau ngực",
+      "lơ mơ"
+    ],
+    "answer": "Nếu người mắc kẹt đang thiếu thuốc quan trọng, hãy báo ngay tên thuốc, số người và vị trí để được ưu tiên hỗ trợ."
+  },
+  {
+    "id": "playbook-037",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "ngửi thấy mùi gas sau ngập phải làm sao",
+      "nghi rò gas trong nhà sau lũ",
+      "nhà ngập xong có mùi gas"
+    ],
+    "immediate_actions": [
+      "Rời khỏi khu vực ngay nếu làm được an toàn",
+      "Mở thoáng nếu có thể mà không phải bật công tắc",
+      "Gọi đơn vị gas hoặc cứu hộ từ bên ngoài"
+    ],
+    "dont_do": [
+      "Không bật tắt công tắc điện",
+      "Không châm lửa, hút thuốc hoặc dùng thiết bị tạo tia lửa"
+    ],
+    "escalate_if": [
+      "mùi gas rất mạnh",
+      "có người chóng mặt",
+      "nghe tiếng xì"
+    ],
+    "answer": "Mùi gas sau ngập là tình huống nguy hiểm. Hãy rời khỏi khu vực, không bật công tắc hay châm lửa, và gọi hỗ trợ ngay."
+  },
+  {
+    "id": "playbook-038",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "dùng máy phát điện trong nhà có sao không",
+      "đặt máy phát ở gara được không",
+      "mất điện nên để máy nổ ở trong hiên kín được không"
+    ],
+    "immediate_actions": [
+      "Chỉ dùng máy phát điện ngoài trời, xa cửa sổ, cửa ra vào và lỗ thông gió",
+      "Nếu đang dùng trong nhà hoặc gara, tắt máy và di chuyển ra ngoài trời ngay"
+    ],
+    "dont_do": [
+      "Không vận hành máy phát trong nhà, gara, hành lang kín hoặc sát cửa sổ",
+      "Không để khí xả thổi vào nhà"
+    ],
+    "escalate_if": [
+      "đau đầu",
+      "buồn nôn",
+      "chóng mặt",
+      "lơ mơ"
+    ],
+    "answer": "Máy phát điện trong nhà hoặc gara có thể gây ngộ độc khí rất nguy hiểm. Chỉ dùng ngoài trời và cách xa các lối thông gió của nhà."
+  },
+  {
+    "id": "playbook-039",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "có tia lửa và mùi khét sau ngập phải làm sao",
+      "nghi chập điện sau lũ",
+      "ổ điện bốc khói sau khi nước rút"
+    ],
+    "immediate_actions": [
+      "Rời xa khu vực đó ngay",
+      "Ngắt điện từ vị trí an toàn nếu làm được",
+      "Gọi cứu hộ, điện lực hoặc lực lượng PCCC"
+    ],
+    "dont_do": [
+      "Không đổ nước vào thiết bị điện đang chập",
+      "Không chạm tay vào ổ cắm hoặc dây điện có tia lửa"
+    ],
+    "escalate_if": [
+      "khói nhiều",
+      "lửa bùng lên",
+      "có người bị điện giật"
+    ],
+    "answer": "Tia lửa, mùi khét hoặc khói từ thiết bị điện sau ngập là dấu hiệu nguy hiểm. Hãy tránh xa, ngắt điện an toàn nếu có thể và gọi hỗ trợ ngay."
+  },
+  {
+    "id": "playbook-040",
+    "category": "evacuation",
+    "severity": "yellow",
+    "question_variations": [
+      "mất điện có nên thắp nến trong nhà ngập không",
+      "dùng nến khi mất điện lúc ngập có an toàn không",
+      "chiếu sáng ban đêm khi ngập nên dùng gì"
+    ],
+    "immediate_actions": [
+      "Ưu tiên dùng đèn pin hoặc đèn dùng pin",
+      "Nếu buộc phải dùng nến, đặt ở giá chắc chắn và cách xa vật dễ cháy"
+    ],
+    "dont_do": [
+      "Không để nến cháy mà không có người trông",
+      "Không để nến gần rèm, giấy, chăn màn hoặc nơi có khí gas"
+    ],
+    "escalate_if": [
+      "mùi gas",
+      "khói",
+      "chập điện"
+    ],
+    "answer": "Khi mất điện trong vùng ngập, nên ưu tiên đèn pin hoặc đèn dùng pin. Nếu dùng nến, phải rất thận trọng và không để cháy không người trông."
+  },
+  {
+    "id": "playbook-041",
+    "category": "food_water_safety",
+    "severity": "orange",
+    "question_variations": [
+      "lỡ uống nước ngập phải làm sao",
+      "uống nhầm nước lũ có nguy hiểm không",
+      "trẻ lỡ uống nước bẩn sau ngập"
+    ],
+    "immediate_actions": [
+      "Ngừng dùng nguồn nước đó ngay",
+      "Chuyển sang nước đóng chai hoặc nước đã xử lý an toàn",
+      "Theo dõi nôn, đau bụng, tiêu chảy, sốt"
+    ],
+    "dont_do": [
+      "Không tiếp tục uống nguồn nước nghi bẩn",
+      "Không pha sữa hoặc thuốc bằng nước không an toàn"
+    ],
+    "escalate_if": [
+      "trẻ nhỏ",
+      "người già",
+      "nôn nhiều",
+      "tiêu chảy nhiều",
+      "sốt"
+    ],
+    "answer": "Nếu lỡ uống nước ngập, hãy chuyển ngay sang nguồn nước an toàn và theo dõi triệu chứng tiêu hóa. Trẻ nhỏ, người già hoặc người có triệu chứng nặng nên được đi khám sớm."
+  },
+  {
+    "id": "playbook-042",
+    "category": "food_water_safety",
+    "severity": "orange",
+    "question_variations": [
+      "nước máy sau ngập có an toàn không",
+      "nước giếng bị ngập còn dùng được không",
+      "không chắc nước sinh hoạt có sạch sau lũ"
+    ],
+    "immediate_actions": [
+      "Chỉ dùng nước được xác nhận an toàn hoặc nước đóng chai",
+      "Nếu không có, đun sôi ít nhất 1 phút trước khi dùng theo khuyến cáo thông dụng",
+      "Dùng nước an toàn để uống, nấu ăn, pha sữa và đánh răng"
+    ],
+    "dont_do": [
+      "Không dùng nước đục hoặc có mùi lạ để ăn uống",
+      "Không dùng nước chưa xử lý cho trẻ sơ sinh hoặc người bệnh"
+    ],
+    "escalate_if": [
+      "nghi có hóa chất, xăng dầu",
+      "nhiều người trong nhà bị tiêu chảy"
+    ],
+    "answer": "Sau ngập, chỉ nên dùng nguồn nước đã được xác nhận an toàn. Nếu chưa chắc, hãy dùng nước đóng chai hoặc nước đã đun sôi/xử lý phù hợp."
+  },
+  {
+    "id": "playbook-043",
+    "category": "food_water_safety",
+    "severity": "orange",
+    "question_variations": [
+      "đồ ăn chạm nước lũ có dùng được không",
+      "thực phẩm bị ngập nước có nên giữ lại",
+      "đồ hộp chạm nước ngập xử lý sao"
+    ],
+    "immediate_actions": [
+      "Loại bỏ thực phẩm có thể đã tiếp xúc trực tiếp với nước lũ",
+      "Chỉ xem xét giữ lại đồ hộp kim loại hoặc bao bì chống nước còn nguyên vẹn và vệ sinh đúng cách"
+    ],
+    "dont_do": [
+      "Không ăn thực phẩm bị nước lũ chạm vào nếu không chắc an toàn",
+      "Không giữ lại đồ ăn trong bao giấy, nhựa mềm, vải hoặc hộp các-tông đã dính nước"
+    ],
+    "escalate_if": [
+      "thực phẩm cho trẻ nhỏ",
+      "thuốc",
+      "nước uống"
+    ],
+    "answer": "Không nên ăn thực phẩm có thể đã tiếp xúc với nước lũ. Nếu phân vân, tốt nhất là bỏ đi để tránh ngộ độc."
+  },
+  {
+    "id": "playbook-044",
+    "category": "food_water_safety",
+    "severity": "yellow",
+    "question_variations": [
+      "mất điện lâu thực phẩm trong tủ lạnh có còn dùng được không",
+      "tủ lạnh mất điện khi ngập thì xử lý đồ ăn sao",
+      "đồ đông lạnh mất điện lâu có giữ được không"
+    ],
+    "immediate_actions": [
+      "Giữ cửa tủ lạnh và tủ đông đóng càng nhiều càng tốt",
+      "Bỏ thực phẩm nghi không còn an toàn hoặc có dấu hiệu hỏng"
+    ],
+    "dont_do": [
+      "Không nếm thử để kiểm tra thực phẩm có an toàn hay không",
+      "Không giữ lại đồ ăn có mùi, màu hoặc kết cấu bất thường"
+    ],
+    "escalate_if": [
+      "đã ăn phải và đang nôn, đau bụng, tiêu chảy"
+    ],
+    "answer": "Nếu mất điện kéo dài, thực phẩm lạnh có thể không còn an toàn. Khi nghi ngờ, nên bỏ đi để tránh ngộ độc."
+  },
+  {
+    "id": "playbook-045",
+    "category": "food_water_safety",
+    "severity": "orange",
+    "question_variations": [
+      "bị ngứa da sau khi ngâm nước bẩn phải làm sao",
+      "tiếp xúc nước ngập bị nổi mẩn đỏ",
+      "da bị kích ứng sau lội nước lũ"
+    ],
+    "immediate_actions": [
+      "Rửa sạch da bằng nước sạch và xà phòng",
+      "Thay quần áo khô, sạch",
+      "Hạn chế tiếp xúc lại với nước bẩn"
+    ],
+    "dont_do": [
+      "Không gãi mạnh làm trầy xước da",
+      "Không tiếp tục ngâm vùng da kích ứng trong nước bẩn"
+    ],
+    "escalate_if": [
+      "sốt",
+      "đỏ lan nhanh",
+      "phù nề",
+      "khó thở"
+    ],
+    "answer": "Nếu da bị ngứa hoặc kích ứng sau khi tiếp xúc nước ngập, hãy rửa sạch bằng nước sạch và xà phòng, thay đồ khô và theo dõi. Nếu nặng lên, cần đi khám."
+  },
+  {
+    "id": "playbook-046",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "bị rắn cắn trong vùng ngập phải làm sao",
+      "nghi rắn cắn khi lội nước lũ",
+      "rắn cắn lúc dọn nhà sau ngập"
+    ],
+    "immediate_actions": [
+      "Giữ nạn nhân bình tĩnh và hạn chế cử động",
+      "Rời khỏi khu vực nguy hiểm",
+      "Tìm hỗ trợ y tế ngay"
+    ],
+    "dont_do": [
+      "Không rạch, hút nọc hoặc đắp thuốc lá không rõ nguồn gốc",
+      "Không cố bắt hoặc đuổi theo con rắn"
+    ],
+    "escalate_if": [
+      "đau tăng nhanh",
+      "sưng lan",
+      "khó thở",
+      "lơ mơ"
+    ],
+    "answer": "Rắn cắn trong vùng ngập cần được đánh giá y tế sớm. Hãy giữ người bị cắn bình tĩnh, hạn chế cử động và tìm hỗ trợ ngay."
+  },
+  {
+    "id": "playbook-047",
+    "category": "critical_hazard",
+    "severity": "red",
+    "question_variations": [
+      "bị côn trùng cắn rồi sưng môi khó thở phải làm sao",
+      "sau khi bị ong hoặc côn trùng đốt thì khó thở",
+      "phản ứng nặng sau côn trùng cắn"
+    ],
+    "immediate_actions": [
+      "Gọi cấp cứu ngay",
+      "Đưa người đó khỏi khu vực có côn trùng",
+      "Giữ tư thế dễ thở hơn và theo dõi sát"
+    ],
+    "dont_do": [
+      "Không để người đó ở một mình",
+      "Không cho ăn uống nếu đang khó thở rõ"
+    ],
+    "escalate_if": [
+      "mọi trường hợp khó thở",
+      "sưng môi lưỡi",
+      "choáng"
+    ],
+    "answer": "Khó thở hoặc sưng môi, lưỡi sau khi bị côn trùng cắn là dấu hiệu nguy cấp. Hãy gọi cấp cứu ngay."
+  },
+  {
+    "id": "playbook-048",
+    "category": "safety",
+    "severity": "yellow",
+    "question_variations": [
+      "dọn nhà sau ngập sợ có rắn phải làm sao",
+      "cách tránh rắn khi dọn đống đổ nát sau lũ",
+      "sợ động vật ẩn trong đồ đạc sau ngập"
+    ],
+    "immediate_actions": [
+      "Mang ủng, găng tay dày nếu có",
+      "Dùng gậy kiểm tra trước khi thò tay vào đống đồ hoặc bụi rậm",
+      "Giữ khu vực sáng và quan sát kỹ"
+    ],
+    "dont_do": [
+      "Không bốc dỡ đống đồ tối ẩm bằng tay trần",
+      "Không cố tự bắt rắn"
+    ],
+    "escalate_if": [
+      "phát hiện rắn trong nhà",
+      "có người bị cắn"
+    ],
+    "answer": "Sau ngập, rắn và các động vật khác có thể ẩn trong đống đồ. Hãy dùng đồ bảo hộ, kiểm tra bằng gậy trước và tránh dùng tay trần."
+  },
+  {
+    "id": "playbook-049",
+    "category": "evacuation",
+    "severity": "orange",
+    "question_variations": [
+      "sơ tán ban đêm khi mất điện cần làm gì",
+      "đi tránh trú lúc tối không có đèn phải làm sao",
+      "ban đêm nước lên mà mất điện xử lý sao"
+    ],
+    "immediate_actions": [
+      "Dùng đèn pin hoặc đèn đội đầu nếu có",
+      "Mang theo điện thoại, sạc, thuốc, giấy tờ và nước uống",
+      "Đi theo nhóm nếu có thể và chọn đường cao, tránh ngập"
+    ],
+    "dont_do": [
+      "Không đi vào vùng nước không nhìn rõ độ sâu",
+      "Không đi gần dây điện rơi hoặc khu vực có nước chảy xiết"
+    ],
+    "escalate_if": [
+      "có trẻ em",
+      "có người già",
+      "nước lên nhanh",
+      "mất liên lạc"
+    ],
+    "answer": "Khi phải sơ tán ban đêm và mất điện, hãy ưu tiên ánh sáng dùng pin, mang đồ thiết yếu và tránh tuyệt đối vùng nước sâu hoặc không nhìn rõ."
+  },
+  {
+    "id": "playbook-050",
+    "category": "communication",
+    "severity": "orange",
+    "question_variations": [
+      "mất liên lạc với người nhà trong vùng ngập phải làm sao",
+      "không gọi được cho người thân đang mắc kẹt",
+      "muốn báo mất liên lạc trong bão lũ"
+    ],
+    "immediate_actions": [
+      "Gửi tên, số điện thoại, địa chỉ cuối cùng biết được và thời điểm mất liên lạc",
+      "Cho biết có trẻ em, người già hoặc người bệnh hay không",
+      "Tạo phiếu xác minh/cứu hộ nếu có nguy cơ mắc kẹt"
+    ],
+    "dont_do": [
+      "Không tự lao vào vùng ngập nguy hiểm để tìm nếu không có phương tiện an toàn"
+    ],
+    "escalate_if": [
+      "người mất liên lạc là trẻ em",
+      "người già",
+      "người bệnh",
+      "vùng đó nước dâng nhanh"
+    ],
+    "answer": "Nếu mất liên lạc với người thân trong vùng ngập, hãy gửi ngay thông tin nhận dạng, vị trí cuối cùng biết được và số người liên quan để tạo phiếu hỗ trợ."
+  },
+  {
+    "id": "playbook-051",
+    "category": "evacuation",
+    "severity": "orange",
+    "question_variations": [
+      "có nên ở lại nhà khi nước đang lên không",
+      "nước dâng nhưng chưa ngập sâu có nên sơ tán sớm",
+      "ở lại hay đi khi có cảnh báo ngập nhanh"
+    ],
+    "immediate_actions": [
+      "Nếu có cảnh báo ngập nhanh hoặc nước đang dâng, chuẩn bị rời đi sớm tới nơi cao an toàn",
+      "Mang theo đồ thiết yếu và liên lạc cho người thân"
+    ],
+    "dont_do": [
+      "Không chờ đến khi nước sâu mới rời đi",
+      "Không lái xe hoặc đi bộ qua nước chảy xiết"
+    ],
+    "escalate_if": [
+      "ban đêm",
+      "mất điện",
+      "có trẻ em hoặc người già",
+      "nhà ở tầng thấp"
+    ],
+    "answer": "Nếu nước đang dâng hoặc có cảnh báo ngập nhanh, nên sơ tán sớm tới nơi cao an toàn thay vì chờ tới khi tình hình xấu hơn."
+  },
+  {
+    "id": "playbook-052",
+    "category": "communication",
+    "severity": "yellow",
+    "question_variations": [
+      "điện thoại sắp hết pin khi chờ cứu hộ phải làm sao",
+      "giữ pin điện thoại trong lúc ngập thế nào",
+      "mất điện lâu nên tiết kiệm pin ra sao"
+    ],
+    "immediate_actions": [
+      "Giảm độ sáng màn hình và bật chế độ tiết kiệm pin",
+      "Tắt ứng dụng không cần thiết, chỉ giữ liên lạc quan trọng",
+      "Ưu tiên gửi tin nhắn ngắn chứa vị trí, số người và mức nguy hiểm"
+    ],
+    "dont_do": [
+      "Không dùng pin cho nội dung không cần thiết khi đang chờ cứu hộ"
+    ],
+    "escalate_if": [
+      "mất liên lạc hoàn toàn",
+      "không thể gửi vị trí"
+    ],
+    "answer": "Khi điện thoại sắp hết pin trong lúc chờ cứu hộ, hãy bật tiết kiệm pin và ưu tiên chỉ gửi thông tin quan trọng như vị trí, số người và tình trạng nguy hiểm."
+  }
+]

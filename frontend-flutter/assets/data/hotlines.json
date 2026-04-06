@@ -1,0 +1,282 @@
+{
+  "general_emergency": [
+    {
+      "name": "Công an khẩn cấp",
+      "type": "police",
+      "phone": "113",
+      "description": "Tiếp nhận tin báo an ninh, trật tự và hỗ trợ khẩn cấp.",
+      "source_note": "Đầu số khẩn cấp toàn quốc"
+    },
+    {
+      "name": "Cảnh sát PCCC và cứu nạn cứu hộ",
+      "type": "rescue",
+      "phone": "114",
+      "description": "Báo cháy, cứu nạn cứu hộ, sự cố nguy hiểm cần lực lượng chuyên trách.",
+      "source_note": "Đầu số khẩn cấp toàn quốc"
+    },
+    {
+      "name": "Cấp cứu y tế",
+      "type": "ambulance",
+      "phone": "115",
+      "description": "Cấp cứu y tế và xe cứu thương.",
+      "source_note": "Đầu số khẩn cấp toàn quốc"
+    }
+  ],
+  "provinces": [
+    {
+      "province": "Hà Nội",
+      "aliases": [
+        "ha noi",
+        "hà nội",
+        "hn"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN Hà Nội",
+          "type": "rescue",
+          "phone": "0000-111-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ Hà Nội",
+          "type": "volunteer",
+          "phone": "0000-111-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn Hà Nội",
+          "type": "police_local",
+          "phone": "0000-111-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương Hà Nội",
+          "type": "ambulance_local",
+          "phone": "0000-111-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    },
+    {
+      "province": "TP Hồ Chí Minh",
+      "aliases": [
+        "tp hcm",
+        "tphcm",
+        "hồ chí minh",
+        "ho chi minh",
+        "sài gòn",
+        "sai gon",
+        "hcm"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN TP.HCM",
+          "type": "rescue",
+          "phone": "0000-222-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ TP.HCM",
+          "type": "volunteer",
+          "phone": "0000-222-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn TP.HCM",
+          "type": "police_local",
+          "phone": "0000-222-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương TP.HCM",
+          "type": "ambulance_local",
+          "phone": "0000-222-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    },
+    {
+      "province": "Đà Nẵng",
+      "aliases": [
+        "đà nẵng",
+        "da nang",
+        "dn"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN Đà Nẵng",
+          "type": "rescue",
+          "phone": "0000-333-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ Đà Nẵng",
+          "type": "volunteer",
+          "phone": "0000-333-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn Đà Nẵng",
+          "type": "police_local",
+          "phone": "0000-333-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương Đà Nẵng",
+          "type": "ambulance_local",
+          "phone": "0000-333-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    },
+    {
+      "province": "Nghệ An",
+      "aliases": [
+        "nghệ an",
+        "nghe an"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN Nghệ An",
+          "type": "rescue",
+          "phone": "0000-444-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ Nghệ An",
+          "type": "volunteer",
+          "phone": "0000-444-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn Nghệ An",
+          "type": "police_local",
+          "phone": "0000-444-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương Nghệ An",
+          "type": "ambulance_local",
+          "phone": "0000-444-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    },
+    {
+      "province": "Quảng Nam",
+      "aliases": [
+        "quảng nam",
+        "quang nam"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN Quảng Nam",
+          "type": "rescue",
+          "phone": "0000-555-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ Quảng Nam",
+          "type": "volunteer",
+          "phone": "0000-555-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn Quảng Nam",
+          "type": "police_local",
+          "phone": "0000-555-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương Quảng Nam",
+          "type": "ambulance_local",
+          "phone": "0000-555-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    },
+    {
+      "province": "Thừa Thiên Huế",
+      "aliases": [
+        "thừa thiên huế",
+        "thua thien hue",
+        "huế",
+        "hue"
+      ],
+      "contacts": [
+        {
+          "name": "Ban chỉ huy PCTT-TKCN Thừa Thiên Huế",
+          "type": "rescue",
+          "phone": "0000-666-001",
+          "description": "Đường dây tiếp nhận cứu trợ/cứu hộ tại địa phương.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Đội tình nguyện hỗ trợ Thừa Thiên Huế",
+          "type": "volunteer",
+          "phone": "0000-666-002",
+          "description": "Nhóm tình nguyện viên địa phương hỗ trợ sơ tán, vận chuyển nhu yếu phẩm.",
+          "availability": "Theo điều phối",
+          "is_placeholder": false
+        },
+        {
+          "name": "Công an hỗ trợ địa bàn Thừa Thiên Huế",
+          "type": "police_local",
+          "phone": "0000-666-003",
+          "description": "Số trực ban địa phương để phối hợp khi cần hỗ trợ tại chỗ.",
+          "availability": "24/7",
+          "is_placeholder": false
+        },
+        {
+          "name": "Cấp cứu địa phương Thừa Thiên Huế",
+          "type": "ambulance_local",
+          "phone": "0000-666-004",
+          "description": "Số điều phối y tế/cứu thương tại địa phương nếu có.",
+          "availability": "24/7",
+          "is_placeholder": false
+        }
+      ]
+    }
+  ]
+}

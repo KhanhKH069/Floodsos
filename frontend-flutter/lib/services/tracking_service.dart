@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../services/socket_service.dart';
 import '../services/tracking_offline_buffer.dart';
@@ -37,7 +38,10 @@ class TrackingService {
 
   Future<String> _getDeviceId() async {
     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      final webBrowserInfo = await deviceInfo.webBrowserInfo;
+      return webBrowserInfo.userAgent ?? 'web_browser_${DateTime.now().millisecondsSinceEpoch}';
+    } else if (Platform.isAndroid) {
       final androidInfo = await deviceInfo.androidInfo;
       return androidInfo.id;
     } else if (Platform.isIOS) {

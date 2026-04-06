@@ -32,6 +32,25 @@ app.use('/api/auth', authRoutes);
 app.use('/api/sos',  sosRoutes);
 app.use('/api/chat', chatRoutes);
 
+// ─── Flood Zones proxy → priority_api.py ─────────────────────────────────────
+// Docker: FLOOD_ZONES_URL=http://priority-api:8765/flood-zones
+// Local:  fallback http://127.0.0.1:8765/flood-zones
+const FLOOD_ZONES_URL = process.env.FLOOD_ZONES_URL || 'http://127.0.0.1:8765/flood-zones';
+
+app.get('/api/flood-zones', async (req, res) => {
+    try {
+        const response = await fetch(FLOOD_ZONES_URL, {
+            signal: AbortSignal.timeout(8000),
+        });
+        if (!response.ok) throw new Error(`Python API: ${response.status}`);
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        console.warn('[flood-zones] Python API unavailable:', err.message);
+        res.json([]);
+    }
+});
+
 // ─── Database + Startup ───────────────────────────────────────────────────────
 connectDB().then(async () => {
     await backfillSosCsvFromMongo();

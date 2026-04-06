@@ -82,6 +82,8 @@ exports.voiceSos = async (req, res) => {
     try {
         const lat = parseFloat(req.body.lat || req.body.latitude);
         const lon = parseFloat(req.body.lon || req.body.longitude);
+        const needsHelp = req.body.needs_help === 'true' || req.body.needs_help === true;
+        const mobilityStatus = req.body.mobility_status || 'can_walk';
 
         const csv_id = `SOS${String(Date.now()).slice(-6)}${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
         const newAlert = new SOSAlert({
@@ -89,7 +91,9 @@ exports.voiceSos = async (req, res) => {
             water_level: req.body.water_level, people_count: req.body.people_count,
             message: req.body.message, status: 'warning',
             assigned_drone: null, csv_id,
-            audio: req.file ? req.file.filename : null
+            audio: req.file ? req.file.filename : null,
+            needs_help: needsHelp,
+            mobility_status: mobilityStatus,
         });
         await newAlert.save();
 
@@ -111,6 +115,23 @@ exports.voiceSos = async (req, res) => {
             flood_prob_near: floodProbNear ?? '',
             time_selected: ''
         });
+
+        // ── Nếu cần giúp đỡ → broadcast tới người trong 500m ─────────────────
+        if (needsHelp) {
+            const socketManager = require('../config/socketManager');
+            socketManager.broadcastNearbySOS({
+                sosId: newAlert._id.toString(),
+                deviceId: req.body.device_id || '',
+                name: newAlert.name || 'Người dùng',
+                phone: newAlert.phone || '',
+                lat, lon,
+                waterLevel: req.body.water_level || '',
+                peopleCount: newAlert.people_count || 1,
+                message: newAlert.message || '',
+                mobilityStatus,
+                urgencyProb,
+            }, 500);
+        }
 
         res.status(200).json({ success: true, urgency_prob: urgencyProb, is_urgent: urgency?.is_urgent ?? null });
     } catch (e) { res.status(500).json({ success: false }); }
@@ -260,6 +281,60 @@ exports.analyzeRoute = async (req, res) => {
 
 // Export backfill function for use in server.js
 exports.backfillSosCsvFromMongo = backfillSosCsvFromMongo;
+
+// ── Community Rescue Volunteer Handlers ──────────────────────────────────────
+
+/** POST /api/sos/:id/volunteer/accept — Volunteer nhận nhiệm vụ */
+exports.volunteerAccept = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { volunteerName, volunteerPhone } = req.body;
+        const socketManager = require('../config/socketManager');
+        socketManager.getIo().emit('volunteer_update', {
+            sosId: id, status: 'accepted',
+            volunteerName, volunteerPhone,
+            timestamp: Date.now(),
+        });
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false }); }
+};
+
+/** POST /api/sos/:id/volunteer/arrive — Volunteer đã đến nơi nạn nhân */
+exports.volunteerArrive = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const socketManager = require('../config/socketManager');
+        socketManager.getIo().emit('volunteer_update', {
+            sosId: id, status: 'arrived', timestamp: Date.now(),
+        });
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false }); }
+};
+
+/** POST /api/sos/:id/volunteer/complete — Đã đưa đến nơi an toàn → resolve SOS */
+exports.volunteerComplete = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const alert = await SOSAlert.findById(id);
+        if (alert) {
+            await SOSHistory.create({
+                lat: alert.lat, lon: alert.lon, phone: alert.phone, name: alert.name,
+                water_level: alert.water_level, people_count: alert.people_count,
+                status: 'community_rescued', message: alert.message,
+                created_at: alert.created_at, resolved_at: new Date(),
+                resolved_action: 'community_rescue',
+            });
+            await SOSAlert.findByIdAndDelete(id);
+            if (alert.csv_id) removeSosFromCsv(alert.csv_id);
+        }
+        const socketManager = require('../config/socketManager');
+        socketManager.getIo().emit('volunteer_update', {
+            sosId: id, status: 'completed', timestamp: Date.now(),
+        });
+        socketManager.getIo().emit('sos_resolved', { sosId: id });
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ success: false }); }
+};
 
 /** POST /api/sos/tracking/sync — Đồng bộ dữ liệu tracking offline */
 exports.syncTrackingOffline = async (req, res) => {
